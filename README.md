@@ -37,7 +37,7 @@ module.exports = {
         copyright: 'Hiuraa API Base'
     },
     description: 'Integrated API solution for your modern application development needs. Fast, secure, and reliable access.',
-    icon: '/icon.png',
+    icon: '/image/icon.png',
     author: 'Rynn',
     info_url: 'https://whatsapp.com/channel/0029Vb9MIdiDDmFXasVPVG1t',
     links: [
