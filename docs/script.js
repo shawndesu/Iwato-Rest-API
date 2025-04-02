@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         const endpoints = await (await fetch('/endpoints')).json();
         const set = await (await fetch('/set')).json();
         
+        setContent('api-icon', 'href', set.icon);
+        setContent('api-title', 'textContent', set.name.main);
+        setContent('api-description', 'content', set.description);
         setContent('api-name', 'textContent', set.name.main);
         setContent('api-author', 'textContent', `by ${set.author}`);
         setContent('api-desc', 'textContent', set.description);
