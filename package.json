@@ -1,0 +1,19 @@
+{
+  "name": "hiuraa-api-base",
+  "version": "1.0.0",
+  "description": "just a base :3",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "rynn",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "chalk": "^4.1.2",
+    "cheerio": "^1.0.0",
+    "express": "^4.19.2",
+    "yt-search": "^2.12.1"
+  }
+}
