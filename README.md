@@ -66,7 +66,7 @@ You can easily deploy your Hiuraa API to Vercel:
 
 1. Click the deploy button below:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Frynxzyy%2FHiuraa-API-Base)
+  [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Frynxzyy%2FHiuraa-API-Base)
 
 2. Follow the on-screen instructions
 3. Configure environment variables if needed
