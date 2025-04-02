@@ -125,7 +125,7 @@ All endpoints are automatically documented and accessible through the `/endpoint
 
 ## License
 
-[MIT License](LICENCE) - Feel free to use and modify according to your needs.
+[MIT License](LICENSE) - Feel free to use and modify according to your needs.
 
 ## Author
 
