@@ -15,6 +15,7 @@
 - **Built-in Documentation**: Self-documenting API with endpoint explorer
 - **Scraper Integration**: Ready-to-use scraper module for web data extraction
 - **Network Ready**: Automatic detection of network interfaces for easier testing
+- **Vercel Deployment**: One-click deployment to Vercel
 
 ## 📋 Requirements
 
@@ -25,7 +26,7 @@
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/Hiuraa-API-Base.git
+git clone https://github.com/rynxzyy/Hiuraa-API-Base.git
 cd Hiuraa-API-Base
 ```
 
@@ -34,11 +35,22 @@ cd Hiuraa-API-Base
 npm install
 ```
 
-3. Create a `settings.js` file:
+3. Modify the `settings.js` file:
 ```javascript
 module.exports = {
-    author: "YourName",
-    // Add other settings as needed
+    name: {
+        main: 'Hiuraa API Base !!',
+        copyright: 'Hiuraa API Base'
+    },
+    description: 'Integrated API solution for your modern application development needs. Fast, secure, and reliable access.',
+    author: 'Rynn',
+    info_url: 'https://whatsapp.com/channel/0029Vb9MIdiDDmFXasVPVG1t',
+    links: [
+        {
+            name: 'WhatsApp Information Ch.',
+            url: 'https://whatsapp.com/channel/0029Vb9MIdiDDmFXasVPVG1t'
+        }
+    ]
 };
 ```
 
@@ -48,6 +60,18 @@ npm start
 ```
 
 Visit `http://localhost:4000` to see your API in action!
+
+## 🌐 Deploy to Vercel
+
+You can easily deploy your Hiuraa API to Vercel:
+
+1. Click the deploy button below:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Frynxzyy%2FHiuraa-API-Base)
+
+2. Follow the on-screen instructions
+3. Configure environment variables if needed
+4. Deploy!
 
 ## 🛠️ Creating Endpoints
 
