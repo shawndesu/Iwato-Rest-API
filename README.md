@@ -88,7 +88,7 @@ module.exports = {
 };
 ```
 
-This automatically creates an endpoint at `/hello/world` with proper documentation.
+This automatically creates an endpoint at `/greetings/hello-world` with proper documentation.
 
 ## Key Features Explained
 
@@ -113,8 +113,5 @@ A built-in scraper system that:
 
 ## Author
 
-Created by Rynn
-
----
-
+Created by Rynn.
 Feel free to contribute, report issues, or suggest improvements!
