@@ -1,6 +1,6 @@
 # Hiuraa-API-Base
 
-![Hiuraa API](https://img.shields.io/badge/Hiuraa-API-blue)
+![Hiuraa API Base](https://img.shields.io/badge/Hiuraa-API-Base-blue)
 ![Version](https://img.shields.io/badge/version-1.0.0-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 
@@ -8,13 +8,12 @@
 
 ## Features
 
-- Simple & Lightweight: Easy to understand codebase with minimal dependencies
-- Auto-Discovery: Automatic endpoint registration and documentation
-- Dynamic Module Loading: Hot-reload capability for API modules
-- Well-Organized Structure: Category-based endpoint organization
-- Scraper Integration: Ready-to-use scraper module for web data extraction
-- Network Ready: Automatic detection of network interfaces for easier testing
-- Vercel Deployment: One-click deployment to Vercel
+- **Simple & Lightweight**: Easy to understand codebase with minimal dependencies
+- **Auto-Discovery**: Automatic endpoint registration
+- **Dynamic Module Loading**: Hot-reload capability for API modules
+- **Well-Organized Structure**: Category-based endpoint organization
+- **Scraper Integration**: Ready-to-use scraper module for web data extraction
+- **Network Ready**: Automatic detection of network interfaces for easier testing
 
 ## Requirements
 
@@ -66,7 +65,7 @@ You can easily deploy your Hiuraa API to Vercel:
 
 1. Click the deploy button below:
 
-  [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Frynxzyy%2FHiuraa-API-Base)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Frynxzyy%2FHiuraa-API-Base)
 
 2. Follow the on-screen instructions
 3. Configure environment variables if needed
@@ -110,18 +109,6 @@ A built-in scraper system that:
 - Auto-loads from the `lib/scrape_file` directory
 - Hot-reloads on changes (every 2 seconds)
 - Provides a global `scraper` object
-
-## API Endpoints
-
-### Core System Endpoints
-
-- `/` - Documentation homepage
-- `/endpoints` - List all available API endpoints
-- `/set` - Get server settings
-
-### Your Custom Endpoints
-
-All endpoints are automatically documented and accessible through the `/endpoints` route.
 
 ## License
 
