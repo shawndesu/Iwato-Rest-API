@@ -6,23 +6,22 @@
 
 **Hiuraa-API-Base** is a simple, yet powerful and highly customizable REST API foundation. Built with Express.js, it provides developers with a solid starting point to create their own API services with minimal setup and maximum flexibility.
 
-## 🌟 Features
+## Features
 
-- **Simple & Lightweight**: Easy to understand codebase with minimal dependencies
-- **Auto-Discovery**: Automatic endpoint registration and documentation
-- **Dynamic Module Loading**: Hot-reload capability for API modules
-- **Well-Organized Structure**: Category-based endpoint organization
-- **Built-in Documentation**: Self-documenting API with endpoint explorer
-- **Scraper Integration**: Ready-to-use scraper module for web data extraction
-- **Network Ready**: Automatic detection of network interfaces for easier testing
-- **Vercel Deployment**: One-click deployment to Vercel
+- Simple & Lightweight: Easy to understand codebase with minimal dependencies
+- Auto-Discovery: Automatic endpoint registration and documentation
+- Dynamic Module Loading: Hot-reload capability for API modules
+- Well-Organized Structure: Category-based endpoint organization
+- Scraper Integration: Ready-to-use scraper module for web data extraction
+- Network Ready: Automatic detection of network interfaces for easier testing
+- Vercel Deployment: One-click deployment to Vercel
 
-## 📋 Requirements
+## Requirements
 
 - Node.js (v18 or higher)
 - NPM or Yarn
 
-## 🚀 Quick Start
+## Quick Start
 
 1. Clone the repository:
 ```bash
@@ -61,7 +60,7 @@ npm start
 
 Visit `http://localhost:4000` to see your API in action!
 
-## 🌐 Deploy to Vercel
+## Deploy to Vercel
 
 You can easily deploy your Hiuraa API to Vercel:
 
@@ -73,18 +72,17 @@ You can easily deploy your Hiuraa API to Vercel:
 3. Configure environment variables if needed
 4. Deploy!
 
-## 🛠️ Creating Endpoints
+## Creating Endpoints
 
 Creating new endpoints is simple. Just add a JavaScript file to the `api` directory:
 
 ```javascript
-// api/hello/world.js
 module.exports = {
     name: "Hello World",
     desc: "Returns a friendly greeting",
     category: "Greetings",
     params: ["name"],
-    run: async (req, res) => {
+    async run(req, res) {
         const name = req.query.name || "World";
         res.json({
             status: true,
@@ -96,7 +94,7 @@ module.exports = {
 
 This automatically creates an endpoint at `/hello/world` with proper documentation.
 
-## ✨ Key Features Explained
+## Key Features Explained
 
 ### Automatic Endpoint Registration
 
@@ -113,7 +111,7 @@ A built-in scraper system that:
 - Hot-reloads on changes (every 2 seconds)
 - Provides a global `scraper` object
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Core System Endpoints
 
@@ -125,11 +123,11 @@ A built-in scraper system that:
 
 All endpoints are automatically documented and accessible through the `/endpoints` route.
 
-## 📝 License
+## License
 
-MIT License - Feel free to use and modify according to your needs.
+[MIT License](LICENCE) - Feel free to use and modify according to your needs.
 
-## 👨‍💻 Author
+## Author
 
 Created by Rynn
 
