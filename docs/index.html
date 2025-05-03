@@ -3,97 +3,740 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta id="api-description" name="description" content="Description">
+    <meta name="description" content="API Documentation">
     <link id="api-icon" rel="icon" href="/image/icon.png" type="image/png">
-    <title id="api-title">Name</title>
+    <title id="api-title">API Documentation</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0F0F0F',
+                            800: '#1A1A1A',
+                            700: '#2A2A2A',
+                            600: '#3A3A3A',
+                            500: '#4A4A4A',
+                            400: '#5A5A5A',
+                        },
+                        accent: {
+                            primary: '#6366F1',
+                            secondary: '#4F46E5',
+                            purple: '#8B5CF6',
+                            pink: '#EC4899'
+                        }
+                    },
+                    boxShadow: {
+                        'premium': '0 4px 20px 0 rgba(0, 0, 0, 0.25)',
+                        'glow': '0 0 15px rgba(99, 102, 241, 0.5)',
+                        'premium-hover': '0 8px 30px 0 rgba(99, 102, 241, 0.3)',
+                    },
+                    animation: {
+                        'ripple': 'ripple 0.6s linear',
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-in': 'slideIn 0.3s ease-in-out',
+                    },
+                    keyframes: {
+                        ripple: {
+                            '0%': { transform: 'scale(0)', opacity: '0.5' },
+                            '100%': { transform: 'scale(2)', opacity: '0' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateY(-10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1A1A1A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3A3A3A;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4A4A4A;
+        }
+
+        /* Prevent scrolling when modal is open */
+        body.modal-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        .api-card {
+            transition: all 0.3s ease;
+        }
+
+        .api-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
+        }
+
+        .gradient-border {
+            position: relative;
+            border-radius: 0.5rem;
+            background: #1A1A1A;
+            padding: 1px;
+        }
+
+        .gradient-border::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 0.5rem;
+            padding: 1px;
+            background: linear-gradient(45deg, #6366F1, #8B5CF6, #EC4899);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        /* Notification dropdown */
+        .notification-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            width: 320px;
+            background-color: #1A1A1A;
+            border: 1px solid #3A3A3A;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            z-index: 50;
+            max-height: 400px;
+            overflow-y: auto;
+            transform-origin: top right;
+            animation: slideIn 0.2s ease-out;
+        }
+
+        .notification-dropdown.show {
+            display: block;
+        }
+
+        .notification-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #3A3A3A;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: #2A2A2A;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item.unread {
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Center notification badge on icon */
+        .notification-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            background-color: #EF4444;
+            color: white;
+            border-radius: 50%;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Hide hamburger on desktop */
+        @media (min-width: 768px) {
+            #toggle-sidebar {
+                display: none;
+            }
+        }
+
+        /* Improve mobile sidebar functionality */
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+                width: 100%;
+                max-width: 280px;
+                z-index: 50;
+                transition: transform 0.3s ease-in-out;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #main-content {
+                margin-left: 0 !important;
+            }
+
+            .notification-dropdown {
+                width: calc(100vw - 32px);
+                max-width: 320px;
+                right: -8px;
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+                backdrop-filter: blur(2px);
+            }
+
+            .sidebar-overlay.active {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
+        /* Animation for page transitions */
+        .page-content {
+            transition: opacity 0.3s ease;
+        }
+
+        .page-content.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .page-content:not(.hidden) {
+            opacity: 1;
+        }
+
+        /* Button ripple effect */
+        .ripple-button {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        /* Copy button styles */
+        .copy-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            background-color: #2A2A2A;
+            color: #A0A0A0;
+            transition: all 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background-color: #3A3A3A;
+            color: white;
+        }
+
+        .copy-button.copied {
+            background-color: #059669;
+            color: white;
+        }
+
+        /* Enhanced Modal styles */
+        .modal-container {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-container.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 32rem;
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: #1A1A1A;
+            border: 1px solid #3A3A3A;
+            border-radius: 0.75rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .modal-container.show .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* Improved modal scrolling */
+        .modal-content {
+            scrollbar-width: thin;
+            scrollbar-color: #3A3A3A #1A1A1A;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #1A1A1A;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background-color: #3A3A3A;
+            border-radius: 6px;
+        }
+
+        /* Prevent horizontal scrolling in modal content */
+        .modal-content pre, 
+        .modal-content code {
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: auto;
+            min-width: 120px;
+            background-color: #3A3A3A;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            font-size: 0.75rem;
+            pointer-events: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #3A3A3A transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Loader styles */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0F0F0F;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #3A3A3A;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        .loader::after {
+            content: '';  
+            box-sizing: border-box;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-bottom-color: #6366F1;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Premium button styles */
+        .premium-button {
+            position: relative;
+            background: linear-gradient(45deg, #6366F1, #8B5CF6, #EC4899);
+            border-radius: 9999px;
+            color: white;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .premium-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .premium-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .premium-button::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #6366F1, #8B5CF6, #EC4899, #6366F1);
+            z-index: -1;
+            border-radius: 9999px;
+            animation: glowing 3s linear infinite;
+        }
+
+        @keyframes glowing {
+            0% { opacity: 0.8; }
+            50% { opacity: 0.5; }
+            100% { opacity: 0.8; }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 16px;
+            background-color: #1A1A1A;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-success {
+            border-left: 4px solid #10B981;
+        }
+
+        .toast-error {
+            border-left: 4px solid #EF4444;
+        }
+
+        /* Notification hover effect */
+        #notification-button {
+            position: relative;
+        }
+
+        #notification-button:hover .notification-badge {
+            transform: translate(-50%, -50%) scale(1.2);
+            transition: transform 0.2s ease;
+        }
+
+        /* Make notifications touchable */
+        .notification-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #3A3A3A;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body class="bg-white min-h-screen pt-[60px] pb-10">
-    <div id="page-loader" class="page-loader bg-white">
+<body class="bg-dark-900 text-gray-200 min-h-screen transition-all duration-300">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <div id="page-loader" class="page-loader">
         <div class="loader"></div>
     </div>
-    <nav class="shadow-sm py-4 px-10 w-full mx-auto fixed top-0 z-20 bg-gray-800">
-    </nav>
-    
-    <div class="px-10 md:px-5 max-w-3xl mx-auto">
-        <div class="flex flex-row items-center mb-6 justify-between">
-            <div class="flex flex-row gap-3">
-                <a id="api-info" target="_blank">
-                    <button class="bg-gray-50 p-2 lg:hidden focus:outline-none">
-                        <span class="material-icons text-gray-600 align-middle">info</span>
-                    </button>
-                </a>
-            </div>
-        </div>
-        <div id="banner" class="border-2 border-dashed border-gray-500 relative p-7 py-10 w-full mb-7">
-            <div class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-gray-800 rounded-full"></div>
-            <div class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-gray-800 rounded-full"></div>
-            <div class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-gray-800 rounded-full"></div>
-            <div class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-gray-800 rounded-full"></div>
-            
-            <div class="flex items-center gap-2 mb-1">
-                <a href="https://github.com/rynxzyy/Hiuraa-API-Base" target="_blank" class="flex items-center text-gray-400 hover:text-gray-500 transition-colors" style="font-size: 12px;">
-                    <i class="fab fa-github mr-2"></i>
-                    <span class="font-medium">Hiuraa API Base</span>
-                </a>
-            </div>
-            
-            <div class="flex flex-wrap items-center gap-2 mb-3">
-                <h2 id="api-name" class="text-3xl font-semibold">Name</h2>
-                <div id="api-author" class="bg-gray-800 text-white text-xs font-semibold px-2 py-1 shrink-0">by Who.</div>
-            </div>
-            <p id="api-desc" class="text-xs text-gray-700 mb-4">Desc</p>
-            <div id="api-links" class="flex flex-col gap-1 text-xs text-gray-600"></div>
-            <div class="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
-                <span id="api-copyright" class="text-xs text-gray-500">© 2025 Name. All rights reserved.</span>
-            </div>
-        </div>
-        
-        <div class="relative w-full mb-6">
-            <input 
-                type="text" 
-                id="api-search" 
-                class="w-full px-4 py-3 text-sm text-gray-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-transparent pl-10" 
-                placeholder="Search API...">
-            <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">search</span>
-        </div>
-        
-        <div class="tab-content" id="api-content"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toast-icon" class="material-icons text-lg"></span>
+        <span id="toast-message"></span>
     </div>
-    
-    <div id="api-modal" class="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden flex items-center justify-center p-6 transition-opacity duration-200 ease-out opacity-0">
-        <div class="fixed inset-0 bg-black opacity-0 transition-opacity duration-200 ease-out"></div>
-        <div class="relative z-10 bg-white shadow-xl w-full max-w-lg mx-auto p-7 my-auto transform scale-95 opacity-0 transition-all duration-200 ease-out">
-            <div class="flex justify-between items-center mb-2">
-                <div class="flex items-center">
-                    <span id="api-method" class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 mr-2">GET</span>
-                    <h3 class="text-xl font-semibold" id="modal-title">API Request</h3>
+
+    <!-- Sidebar -->
+    <aside class="fixed top-0 left-0 h-full w-64 bg-dark-800 border-r border-dark-600 shadow-premium z-30 transform transition-transform duration-300 ease-in-out" id="sidebar">
+        <div class="p-4 border-b border-dark-600">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-r from-accent-primary via-accent-purple to-accent-pink flex items-center justify-center shadow-glow">
+                    <span class="text-white font-bold text-base">API</span>
                 </div>
-                <button id="close-modal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <div>
+                    <h1 id="sidebar-title" class="text-base font-bold text-white">API Documentation</h1>
+                    <p class="text-xs text-gray-400">Premium Dashboard</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="py-5">
+            <nav>
+                <a href="#" class="nav-link flex items-center px-5 py-3 text-gray-200 hover:bg-dark-700 transition-colors duration-200" data-page="home">
+                    <span class="material-icons mr-3">home</span>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-link flex items-center px-5 py-3 text-gray-400 hover:bg-dark-700 hover:text-gray-200 transition-colors duration-200" data-page="stats">
+                    <span class="material-icons mr-3">analytics</span>
+                    <span>Stats</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="absolute bottom-0 left-0 right-0 p-5 border-t border-dark-600">
+            <div class="gradient-border">
+                <div class="p-4 rounded-lg bg-dark-800">
+                    <h4 class="text-sm font-medium text-white mb-1">Premium Dashboard</h4>
+                    <p class="text-xs text-gray-400 mb-3">No authentication required</p>
+                    <div class="w-full bg-dark-600 rounded-full h-1.5">
+                        <div class="bg-gradient-to-r from-accent-primary via-accent-purple to-accent-pink h-1.5 rounded-full" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="ml-64 min-h-screen" id="main-content">
+        <!-- Header -->
+        <header class="flex justify-between items-center p-4 border-b border-dark-600 bg-dark-800 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <button id="toggle-sidebar" class="w-9 h-9 flex items-center justify-center bg-dark-700 rounded-full hover:bg-dark-600 hover:scale-105 transition-all duration-200 shadow-md ripple-button">
+                    <span class="material-icons md-24 text-gray-200">menu</span>
+                </button>
+                <div>
+                    <h1 id="page-title" class="text-base font-bold text-white">Home</h1>
+                    <p class="text-xs text-gray-400">Premium Dashboard</p>
+                </div>
+            </div>
+
+            <div class="flex items-center">
+                <!-- Notification Icon -->
+                <div class="relative">
+                    <button id="notification-button" class="w-9 h-9 flex items-center justify-center bg-dark-700 rounded-full hover:bg-dark-600 hover:scale-105 transition-all duration-200 shadow-md ripple-button relative">
+                        <span class="material-icons md-24 text-gray-200">notifications</span>
+                        <span id="notification-badge" class="notification-badge">3</span>
+                    </button>
+
+                    <!-- Notification Dropdown -->
+                    <div id="notification-dropdown" class="notification-dropdown">
+                        <div class="flex justify-between items-center p-3 border-b border-dark-600">
+                            <h3 class="font-medium text-white">Notifications</h3>
+                            <button id="mark-all-read" class="text-xs text-accent-primary hover:text-accent-secondary">Mark all as read</button>
+                        </div>
+                        <div id="notification-list" class="max-h-[300px] overflow-y-auto">
+                            <!-- Notifications will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="p-6">
+            <!-- Home Page -->
+            <div id="home-page" class="page-content">
+                <div id="banner" class="border-2 border-dashed border-dark-500 relative p-8 py-10 w-full mb-8 rounded-lg bg-dark-800 shadow-premium hover:shadow-glow transition-all duration-300">
+                    <div class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-accent-primary rounded-full"></div>
+                    <div class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-accent-primary rounded-full"></div>
+                    <div class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-accent-primary rounded-full"></div>
+                    <div class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-accent-primary rounded-full"></div>
+
+                    <div class="flex flex-wrap items-center gap-3 mb-4">
+                        <h2 id="api-name" class="text-3xl font-bold text-white">API Documentation</h2>
+                        <div id="api-author" class="bg-gradient-to-r from-accent-primary via-accent-purple to-accent-pink text-white text-xs font-semibold px-3 py-1.5 rounded-full shrink-0 shadow-md">by Author</div>
+                    </div>
+                    <p id="api-desc" class="text-sm text-gray-300 mb-3">Comprehensive API documentation for developers</p>
+                    <div id="api-links" class="flex flex-col gap-1.5 text-xs text-gray-400"></div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="relative w-full mb-6">
+                    <input 
+                        type="text" 
+                        id="api-search" 
+                        class="w-full px-4 py-3 text-sm text-gray-200 bg-dark-700 border border-dark-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent pl-10 transition-all duration-300" 
+                        placeholder="Search API...">
+                    <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">search</span>
+                </div>
+
+                <!-- Separator Line -->
+                <div class="w-full h-px bg-dark-600 mb-6"></div>
+
+                <div class="tab-content" id="api-content">
+                    <!-- API content will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Stats Page -->
+            <div id="stats-page" class="page-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="api-card bg-dark-800 rounded-xl p-6 border border-dark-600 shadow-premium">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-400 text-sm font-medium mb-1">Total Categories</p>
+                                <h3 id="total-categories" class="text-3xl font-bold text-white">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-accent-primary bg-opacity-20 flex items-center justify-center">
+                                <span class="material-icons text-accent-primary">category</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="api-card bg-dark-800 rounded-xl p-6 border border-dark-600 shadow-premium">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-400 text-sm font-medium mb-1">Total APIs</p>
+                                <h3 id="total-apis" class="text-3xl font-bold text-white">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-accent-primary via-accent-purple to-accent-pink flex items-center justify-center">
+                                <span class="material-icons text-white">api</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-dark-800 rounded-xl p-6 border border-dark-600 shadow-premium mb-8">
+                    <h3 class="text-lg font-semibold text-white mb-4">API Categories</h3>
+                    <div id="categories-list" class="space-y-4">
+                        <!-- Categories will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optimized API Modal -->
+    <div id="api-modal" class="modal-container">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center">
+                    <span id="api-method" class="px-3 py-1.5 text-xs font-medium bg-blue-900 text-blue-200 rounded-full mr-3">GET</span>
+                    <h3 class="text-xl font-bold text-white" id="modal-title">API Request</h3>
+                </div>
+                <button id="close-modal" class="text-gray-400 hover:text-white focus:outline-none transition-colors duration-300">
                     <span class="material-icons">close</span>
                 </button>
             </div>
-            
-            <div class="mb-3">
-                <p id="api-description" class="text-xs font-medium text-gray-600 mt-1">API description will appear here</p>
+
+            <div class="mb-5">
+                <p id="api-description" class="text-sm font-medium text-gray-300 mt-1">API description will appear here</p>
             </div>
-            
-            <div id="params-container" class="mb-4"></div>
-            
-            <button id="submit-api" class="bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 text-sm transition duration-300">Send Request</button>
-            
-            <div id="response-container" class="mt-4 hidden">
+
+            <div id="params-container" class="mb-6 space-y-4">
+                <!-- Parameters will be populated by JavaScript -->
+            </div>
+
+            <button id="submit-api" class="premium-button px-5 py-2.5 text-sm font-medium ripple-button w-full">Send Request</button>
+
+            <div id="endpoint-display" class="hidden mt-6 mb-4 relative">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-sm font-medium text-white">Endpoint</h4>
+                    <button id="copy-endpoint" class="copy-button tooltip">
+                        <span class="material-icons text-sm">content_copy</span>
+                        <span class="tooltip-text">Copy to clipboard</span>
+                    </button>
+                </div>
+                <div class="bg-dark-900 border border-dark-600 rounded-lg p-4 text-xs text-gray-300 overflow-auto">
+                    <code id="endpoint-url" class="font-mono break-all"></code>
+                </div>
+            </div>
+
+            <div id="response-container" class="mt-6 hidden">
                 <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-sm font-medium">Response</h4>
+                    <h4 class="text-sm font-medium text-white">Response</h4>
                     <div class="flex items-center">
-                        <span id="response-status" class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 mr-2">200</span>
-                        <span id="response-time" class="text-xs text-gray-500">200ms</span>
+                        <span id="response-status" class="px-2.5 py-1 text-xs font-medium bg-green-900 text-green-200 rounded-full mr-2">200</span>
+                        <span id="response-time" class="text-xs text-gray-400">200ms</span>
                     </div>
                 </div>
-                <pre id="response-data" class="bg-gray-50 p-3 text-xs overflow-auto max-h-60"></pre>
+                <div class="relative">
+                    <pre id="response-data" class="bg-dark-900 border border-dark-600 rounded-lg p-4 text-xs text-gray-300 overflow-auto max-h-80"></pre>
+                    <div id="response-actions" class="absolute top-2 right-2 flex gap-2">
+                        <!-- Copy or download button will be added here -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>

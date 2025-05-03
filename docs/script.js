@@ -1,526 +1,1007 @@
-document.addEventListener('DOMContentLoaded', async function () {
-    document.body.classList.add('noscroll');
-    hideLoader();
-    
-    try {
-        const endpoints = await (await fetch('/endpoints')).json();
-        const set = await (await fetch('/set')).json();
-        
-        setContent('api-icon', 'href', set.icon);
-        setContent('api-title', 'textContent', set.name.main);
-        setContent('api-description', 'content', set.description);
-        setContent('api-name', 'textContent', set.name.main);
-        setContent('api-author', 'textContent', `by ${set.author}`);
-        setContent('api-desc', 'textContent', set.description);
-        setContent('api-copyright', 'textContent', `© 2025 ${set.name.copyright}. All rights reserved.`);
-        setContent('api-info', 'href', set.info_url);
-        
-        setupApiLinks(set);
-        setupApiContent(endpoints);
-        setupApiButtonHandlers(endpoints);
-        setupSearchFunctionality();
-    } catch (error) {
-        console.error('Error loading configuration:', error);
+document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize ripple effect for buttons
+  initRippleEffect()
+
+  document.body.classList.add("noscroll")
+
+  try {
+    // Load data
+    const endpoints = await (await fetch("/endpoints")).json()
+    const set = await (await fetch("/set")).json()
+
+    // Set content
+    setContent("api-icon", "href", set.icon)
+    setContent("api-title", "textContent", set.name)
+    setContent("sidebar-title", "textContent", set.name)
+    setContent("api-description", "textContent", set.description)
+    setContent("api-name", "textContent", set.name)
+    setContent("api-author", "textContent", `by ${set.author}`)
+    setContent("api-desc", "textContent", set.description)
+
+    // Setup components
+    setupApiContent(endpoints)
+    setupApiButtonHandlers(endpoints)
+    setupSearchFunctionality()
+    setupNavigation()
+    updateStats(endpoints)
+    setupNotifications(set.notification)
+
+    // Restore active page from localStorage
+    restoreActivePage()
+  } catch (error) {
+    console.error("Error loading configuration:", error)
+    showToast("Error loading configuration", "error")
+  }
+
+  // Hide loader after initialization
+  hideLoader()
+
+  // Toggle sidebar functionality
+  document.getElementById("toggle-sidebar").addEventListener("click", () => {
+    const sidebar = document.getElementById("sidebar")
+    const sidebarOverlay = document.getElementById("sidebar-overlay")
+
+    if (window.innerWidth < 768) {
+      // Mobile behavior
+      sidebar.classList.toggle("open")
+      sidebarOverlay.classList.toggle("active")
+
+      // Prevent body scrolling when sidebar is open
+      if (sidebar.classList.contains("open")) {
+        document.body.style.overflow = "hidden"
+      } else {
+        document.body.style.overflow = ""
+      }
+    } else {
+      // Desktop behavior
+      const mainContent = document.getElementById("main-content")
+
+      if (sidebar.classList.contains("-translate-x-full")) {
+        sidebar.classList.remove("-translate-x-full")
+        mainContent.classList.remove("ml-0")
+        mainContent.classList.add("ml-64")
+      } else {
+        sidebar.classList.add("-translate-x-full")
+        mainContent.classList.remove("ml-64")
+        mainContent.classList.add("ml-0")
+      }
     }
-    
-    function setContent(id, property, value) {
-        const element = document.getElementById(id);
-        if (element) element[property] = value;
+  })
+
+  // Close sidebar when clicking overlay
+  document.getElementById("sidebar-overlay").addEventListener("click", () => {
+    const sidebar = document.getElementById("sidebar")
+    const sidebarOverlay = document.getElementById("sidebar-overlay")
+
+    sidebar.classList.remove("open")
+    sidebarOverlay.classList.remove("active")
+    document.body.style.overflow = ""
+  })
+
+  // Handle window resize for responsive design
+  window.addEventListener("resize", () => {
+    const sidebar = document.getElementById("sidebar")
+    const mainContent = document.getElementById("main-content")
+    const sidebarOverlay = document.getElementById("sidebar-overlay")
+
+    if (window.innerWidth < 768) {
+      // Mobile layout
+      mainContent.classList.remove("ml-64")
+      mainContent.classList.add("ml-0")
+
+      // Reset sidebar to closed state on mobile
+      sidebar.classList.remove("-translate-x-full")
+      if (!sidebar.classList.contains("open")) {
+        sidebarOverlay.classList.remove("active")
+      }
+    } else {
+      // Desktop layout
+      sidebar.classList.remove("open")
+      sidebarOverlay.classList.remove("active")
+      document.body.style.overflow = ""
+
+      if (!sidebar.classList.contains("-translate-x-full")) {
+        mainContent.classList.remove("ml-0")
+        mainContent.classList.add("ml-64")
+      }
     }
-    
-    function setupApiLinks(gtw) {
-        const apiLinksContainer = document.getElementById('api-links');
-        
-        apiLinksContainer.innerHTML = '';
-        
-        if (apiLinksContainer && gtw.links?.length) {
-            gtw.links.forEach(link => {
-                const linkContainer = document.createElement('div');
-                linkContainer.className = 'flex items-center gap-2';
-                
-                const bulletPoint = document.createElement('div');
-                bulletPoint.className = `w-2 h-2 bg-gray-400 rounded-full`;
-                
-                const linkElement = document.createElement('a');
-                linkElement.href = link.url;
-                linkElement.textContent = link.name;
-                linkElement.className = 'hover:underline';
-                linkElement.target = '_blank';
-                
-                linkContainer.appendChild(bulletPoint);
-                linkContainer.appendChild(linkElement);
-                
-                apiLinksContainer.appendChild(linkContainer);
-            });
+  })
+
+  // Initialize responsive behavior on load
+  if (window.innerWidth < 768) {
+    const mainContent = document.getElementById("main-content")
+    mainContent.classList.remove("ml-64")
+    mainContent.classList.add("ml-0")
+  }
+
+  // Setup notifications dropdown with improved mobile handling
+  document.addEventListener("click", (e) => {
+    const notificationDropdown = document.getElementById("notification-dropdown")
+    const notificationButton = document.getElementById("notification-button")
+
+    if (notificationButton && notificationButton.contains(e.target)) {
+      notificationDropdown.classList.toggle("show")
+      e.stopPropagation()
+    } else if (notificationDropdown && !notificationDropdown.contains(e.target)) {
+      notificationDropdown.classList.remove("show")
+    }
+  })
+})
+
+// Initialize ripple effect for buttons
+function initRippleEffect() {
+  document.addEventListener("click", (e) => {
+    const target = e.target
+
+    // Find the ripple-button parent if the click was on a child element
+    const rippleButton = target.closest(".ripple-button")
+
+    if (!rippleButton) return
+
+    const rect = rippleButton.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    const ripple = document.createElement("span")
+    ripple.className = "ripple"
+    ripple.style.left = `${x}px`
+    ripple.style.top = `${y}px`
+
+    rippleButton.appendChild(ripple)
+
+    // Remove the ripple element after animation completes
+    setTimeout(() => {
+      ripple.remove()
+    }, 600)
+  })
+}
+
+// Toast notification system
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toast")
+  const toastIcon = document.getElementById("toast-icon")
+  const toastMessage = document.getElementById("toast-message")
+
+  // Clear existing classes
+  toast.className = "toast"
+
+  // Add appropriate class based on type
+  if (type === "success") {
+    toast.classList.add("toast-success")
+    toastIcon.textContent = "check_circle"
+  } else if (type === "error") {
+    toast.classList.add("toast-error")
+    toastIcon.textContent = "error"
+  }
+
+  toastMessage.textContent = message
+  toast.classList.add("show")
+
+  // Hide toast after 3 seconds
+  setTimeout(() => {
+    toast.classList.remove("show")
+  }, 3000)
+}
+
+function setContent(id, property, value) {
+  const element = document.getElementById(id)
+  if (element) element[property] = value
+}
+
+function setupNavigation() {
+  const navLinks = document.querySelectorAll(".nav-link")
+  const pageTitle = document.getElementById("page-title")
+
+  navLinks.forEach((link) => {
+    link.addEventListener("click", function (e) {
+      e.preventDefault()
+
+      // Get the page to show
+      const pageToShow = this.getAttribute("data-page")
+
+      // Update active link
+      navLinks.forEach((navLink) => {
+        navLink.classList.remove("bg-dark-700", "text-gray-200")
+        navLink.classList.add("text-gray-400")
+      })
+      this.classList.add("bg-dark-700", "text-gray-200")
+      this.classList.remove("text-gray-400")
+
+      // Update page title
+      pageTitle.textContent = pageToShow.charAt(0).toUpperCase() + pageToShow.slice(1)
+
+      // Hide all pages
+      document.querySelectorAll(".page-content").forEach((page) => {
+        page.classList.add("hidden")
+      })
+
+      // Show the selected page
+      document.getElementById(`${pageToShow}-page`).classList.remove("hidden")
+
+      // Save active page to localStorage
+      localStorage.setItem("activePage", pageToShow)
+
+      // Close sidebar on mobile after navigation
+      if (window.innerWidth < 768) {
+        const sidebar = document.getElementById("sidebar")
+        const sidebarOverlay = document.getElementById("sidebar-overlay")
+
+        sidebar.classList.remove("open")
+        sidebarOverlay.classList.remove("active")
+        document.body.style.overflow = ""
+      }
+    })
+  })
+}
+
+function restoreActivePage() {
+  const activePage = localStorage.getItem("activePage") || "home"
+  const activeLink = document.querySelector(`.nav-link[data-page="${activePage}"]`)
+
+  if (activeLink) {
+    activeLink.click()
+  }
+}
+
+function updateStats(endpoints) {
+  let totalCategories = 0
+  let totalApis = 0
+  const categoriesList = document.getElementById("categories-list")
+  categoriesList.innerHTML = ""
+
+  if (endpoints && endpoints.endpoints) {
+    totalCategories = endpoints.endpoints.length
+
+    endpoints.endpoints.forEach((category) => {
+      const categoryItems = Object.keys(category.items).length
+      totalApis += categoryItems
+
+      // Add category to the categories list
+      const categoryItem = document.createElement("div")
+      categoryItem.className = "flex justify-between items-center p-4 bg-dark-700 rounded-lg"
+      categoryItem.innerHTML = `
+  <div class="flex items-center">
+    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-accent-primary via-accent-purple to-accent-pink bg-opacity-20 flex items-center justify-center mr-3">
+      <span class="material-icons text-white text-sm">folder</span>
+    </div>
+    <span class="text-white font-medium">${category.name}</span>
+  </div>
+  <div class="bg-dark-600 px-3 py-1 rounded-full text-xs font-medium text-gray-300">
+    ${categoryItems} APIs
+  </div>
+`
+
+      categoriesList.appendChild(categoryItem)
+    })
+  }
+
+  // Update stats counters with animation
+  animateCounter("total-categories", 0, totalCategories)
+  animateCounter("total-apis", 0, totalApis)
+}
+
+// Animate counter for stats
+function animateCounter(elementId, start, end) {
+  const element = document.getElementById(elementId)
+  if (!element) return
+
+  const duration = 1000 // ms
+  const frameDuration = 1000 / 60 // 60fps
+  const totalFrames = Math.round(duration / frameDuration)
+  const increment = (end - start) / totalFrames
+
+  let currentFrame = 0
+  let currentValue = start
+
+  const animate = () => {
+    currentFrame++
+    currentValue += increment
+
+    if (currentFrame === totalFrames) {
+      element.textContent = end
+    } else {
+      element.textContent = Math.floor(currentValue)
+      requestAnimationFrame(animate)
+    }
+  }
+
+  animate()
+}
+
+function setupNotifications(notifications) {
+  // Enhance notification dropdown styling
+  const notificationDropdown = document.getElementById("notification-dropdown")
+  notificationDropdown.className = "notification-dropdown shadow-premium border border-dark-500"
+
+  const notificationList = document.getElementById("notification-list")
+  const notificationBadge = document.getElementById("notification-badge")
+  const markAllReadBtn = document.getElementById("mark-all-read")
+
+  // Update notification badge
+  const unreadCount = notifications.filter((n) => !n.read).length
+  notificationBadge.textContent = unreadCount
+  notificationBadge.style.display = unreadCount > 0 ? "flex" : "none"
+
+  // Clear notification list
+  notificationList.innerHTML = ""
+
+  // Populate notification list
+  notifications.forEach((notification) => {
+    const notificationItem = document.createElement("div")
+    notificationItem.className = `notification-item ${notification.read ? "" : "unread"}`
+    notificationItem.dataset.id = notification.id
+
+    notificationItem.innerHTML = `
+      <div class="flex justify-between items-start">
+        <h4 class="font-medium text-white">${notification.title}</h4>
+        ${!notification.read ? '<button class="mark-read text-xs text-accent-primary hover:text-accent-secondary"><span class="material-icons" style="font-size: 16px;">check_circle</span></button>' : ""}
+      </div>
+      <p class="text-sm text-gray-400 mt-1">${notification.message}</p>
+    `
+
+    // Make the entire notification item clickable to mark as read
+    notificationItem.addEventListener("click", function () {
+      if (!notification.read) {
+        notification.read = true
+        this.classList.remove("unread")
+        const markReadBtn = this.querySelector(".mark-read")
+        if (markReadBtn) markReadBtn.remove()
+
+        // Update badge
+        const unreadItems = document.querySelectorAll(".notification-item.unread").length
+        notificationBadge.textContent = unreadItems
+        notificationBadge.style.display = unreadItems > 0 ? "flex" : "none"
+
+        showToast("Notification marked as read", "success")
+      }
+    })
+
+    notificationList.appendChild(notificationItem)
+  })
+
+  // Mark individual notification as read using the button
+  document.querySelectorAll(".mark-read").forEach((button) => {
+    button.addEventListener("click", function (e) {
+      e.stopPropagation() // Prevent triggering the parent click event
+      const notificationItem = this.closest(".notification-item")
+      notificationItem.classList.remove("unread")
+      this.remove()
+
+      // Update badge
+      const unreadItems = document.querySelectorAll(".notification-item.unread").length
+      notificationBadge.textContent = unreadItems
+      notificationBadge.style.display = unreadItems > 0 ? "flex" : "none"
+
+      showToast("Notification marked as read", "success")
+    })
+  })
+
+  // Mark all as read
+  markAllReadBtn.addEventListener("click", () => {
+    document.querySelectorAll(".notification-item").forEach((item) => {
+      item.classList.remove("unread")
+    })
+
+    document.querySelectorAll(".mark-read").forEach((button) => {
+      button.remove()
+    })
+
+    notificationBadge.style.display = "none"
+    showToast("All notifications marked as read", "success")
+  })
+}
+
+const pageLoader = document.getElementById("page-loader")
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    hideLoader()
+  }, 1000)
+})
+
+function showLoader() {
+  const scrollPosition = window.scrollY
+  document.body.style.top = `-${scrollPosition}px`
+  document.body.classList.add("noscroll")
+  pageLoader.style.display = "flex"
+  pageLoader.style.opacity = "1"
+}
+
+function hideLoader() {
+  const scrollPosition = Number.parseInt(document.body.style.top || "0") * -1
+  document.body.classList.remove("noscroll")
+  document.body.style.top = ""
+  window.scrollTo(0, scrollPosition)
+  pageLoader.style.opacity = "0"
+  setTimeout(() => {
+    pageLoader.style.display = "none"
+  }, 800)
+}
+
+function setupApiContent(endpoints) {
+  const apiContent = document.getElementById("api-content")
+  apiContent.innerHTML = ""
+
+  endpoints.endpoints.forEach((category) => {
+    const categoryHeader = document.createElement("h3")
+    categoryHeader.className = "mb-5 text-xl font-bold text-white"
+    categoryHeader.textContent = category.name
+    apiContent.appendChild(categoryHeader)
+
+    const row = document.createElement("div")
+    row.className = "row"
+    apiContent.appendChild(row)
+
+    const sortedItems = Object.entries(category.items)
+      .sort(([, a], [, b]) => (a.name || "").localeCompare(b.name || ""))
+      .map(([, item]) => item)
+
+    sortedItems.forEach((itemData, index) => {
+      const itemName = Object.keys(itemData)[0]
+      const item = itemData[itemName]
+      const isLastItem = index === sortedItems.length - 1
+      const itemElement = createApiItemElement(itemName, item, isLastItem)
+      row.appendChild(itemElement)
+    })
+  })
+}
+
+function createApiItemElement(itemName, item, isLastItem) {
+  const itemDiv = document.createElement("div")
+  itemDiv.className = `w-full ${isLastItem ? "mb-8" : "mb-4"}`
+  itemDiv.dataset.name = itemName || ""
+  itemDiv.dataset.desc = item.desc || "No description available" // Fallback description
+
+  const heroSection = document.createElement("div")
+  heroSection.className =
+    "flex items-center justify-between p-5 px-6 bg-dark-800 border border-dark-600 rounded-lg shadow-premium hover:shadow-premium-hover transition-all duration-300 h-24"
+
+  const textContent = document.createElement("div")
+  textContent.className = "flex-grow mr-4 overflow-hidden"
+
+  const title = document.createElement("h5")
+  title.className = "text-lg font-semibold text-white truncate"
+  title.textContent = itemName || "Unnamed Item"
+
+  const description = document.createElement("p")
+  description.className = "text-sm font-medium text-gray-400 truncate mt-1"
+  description.textContent = item.desc || "No description available" // Fallback description
+
+  textContent.appendChild(title)
+  textContent.appendChild(description)
+
+  const button = document.createElement("button")
+  button.className = "premium-button px-5 py-2.5 text-sm font-medium ripple-button flex-shrink-0 get-api-btn"
+  button.dataset.apiPath = item.path || ""
+  button.dataset.apiName = itemName || ""
+  button.dataset.apiDesc = item.desc || "No description available" // Fallback description
+  button.textContent = "TRY"
+
+  heroSection.appendChild(textContent)
+  heroSection.appendChild(button)
+  itemDiv.appendChild(heroSection)
+
+  return itemDiv
+}
+
+function setupApiButtonHandlers(endpoints) {
+  document.addEventListener("click", (event) => {
+    if (event.target.classList.contains("get-api-btn") || event.target.closest(".get-api-btn")) {
+      const button = event.target.classList.contains("get-api-btn")
+        ? event.target
+        : event.target.closest(".get-api-btn")
+      const { apiPath, apiName, apiDesc } = button.dataset
+
+      const currentItem = endpoints.endpoints
+        .flatMap((category) => Object.values(category.items))
+        .map((itemData) => {
+          const itemName = Object.keys(itemData)[0]
+          return { name: itemName, ...itemData[itemName] }
+        })
+        .find((item) => item.path === apiPath && item.name === apiName)
+
+      openApiModal(apiName, apiPath, apiDesc || "No description available") // Fallback description
+    }
+  })
+}
+
+function setupSearchFunctionality() {
+  const searchInput = document.getElementById("api-search")
+  if (!searchInput) return
+
+  let originalData = null
+
+  function captureOriginalData() {
+    const result = []
+    const categories = document.querySelectorAll("#api-content h3")
+
+    categories.forEach((category) => {
+      const nextElement = category.nextElementSibling
+      if (nextElement && nextElement.classList.contains("row")) {
+        const items = Array.from(nextElement.querySelectorAll("div[data-name]")).map((item) => {
+          return {
+            element: item.cloneNode(true),
+            name: item.dataset.name,
+            desc: item.dataset.desc || "No description available", // Fallback description
+          }
+        })
+
+        result.push({
+          categoryElement: category,
+          rowElement: nextElement,
+          items: items,
+        })
+      }
+    })
+
+    return result
+  }
+
+  function restoreOriginalData() {
+    if (!originalData) return
+
+    originalData.forEach((categoryData) => {
+      categoryData.categoryElement.classList.remove("hidden")
+      const row = categoryData.rowElement
+      row.innerHTML = ""
+
+      categoryData.items.forEach((item, index) => {
+        const newItem = item.element.cloneNode(true)
+        newItem.className = index === categoryData.items.length - 1 ? "w-full mb-8" : "w-full mb-4"
+        row.appendChild(newItem)
+      })
+    })
+  }
+
+  originalData = captureOriginalData()
+
+  searchInput.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim()
+
+    if (!searchTerm) {
+      restoreOriginalData()
+      return
+    }
+
+    const categories = document.querySelectorAll("#api-content h3")
+
+    categories.forEach((category) => {
+      category.classList.remove("hidden")
+    })
+
+    categories.forEach((category) => {
+      const nextElement = category.nextElementSibling
+      if (nextElement && nextElement.classList.contains("row")) {
+        const row = nextElement
+
+        const originalCategoryData = originalData.find((data) => data.categoryElement === category)
+        if (!originalCategoryData) return
+
+        const visibleItems = []
+
+        originalCategoryData.items.forEach((item) => {
+          const title = item.name?.toLowerCase() || ""
+          const desc = item.desc?.toLowerCase() || ""
+
+          if (title.includes(searchTerm) || desc.includes(searchTerm)) {
+            visibleItems.push(item)
+          }
+        })
+
+        if (visibleItems.length === 0) {
+          category.classList.add("hidden")
+          row.innerHTML = ""
+          return
         }
+
+        row.innerHTML = ""
+        visibleItems.forEach((item, index) => {
+          const newItem = item.element.cloneNode(true)
+
+          newItem.className = "w-full mb-4"
+
+          if (index === visibleItems.length - 1) {
+            newItem.className = "w-full mb-8"
+          }
+
+          const button = newItem.querySelector(".get-api-btn")
+          if (button) {
+            button.dataset.apiPath = item.element.querySelector(".get-api-btn")?.dataset.apiPath || ""
+            button.dataset.apiName = item.element.querySelector(".get-api-btn")?.dataset.apiName || ""
+            button.dataset.apiDesc = item.element.querySelector(".get-api-btn")?.dataset.apiDesc || "No description available" // Fallback description
+          }
+
+          row.appendChild(newItem)
+        })
+      }
+    })
+  })
+}
+
+// Copy to clipboard function
+function copyToClipboard(text) {
+  return navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      return true
+    })
+    .catch((error) => {
+      console.error("Failed to copy: ", error)
+      return false
+    })
+}
+
+// Function to create a copy button
+function createCopyButton() {
+  const button = document.createElement("button")
+  button.className = "copy-button tooltip"
+  button.innerHTML = `
+    <span class="material-icons text-sm">content_copy</span>
+    <span class="tooltip-text">Copy to clipboard</span>
+  `
+  return button
+}
+
+// Function to create a download button
+function createDownloadButton(url, filename) {
+  const button = document.createElement("button")
+  button.className = "copy-button tooltip"
+  button.innerHTML = `
+    <span class="material-icons text-sm">download</span>
+    <span class="tooltip-text">Download file</span>
+  `
+
+  button.addEventListener("click", () => {
+    const a = document.createElement("a")
+    a.href = url
+    a.download = filename || "download"
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    showToast("Download started", "success")
+  })
+
+  return button
+}
+
+function openApiModal(name, endpoint, description, method = "GET") {
+  const modal = document.getElementById("api-modal")
+  const modalContent = modal.querySelector(".modal-content")
+  const closeModalBtn = document.getElementById("close-modal")
+  const submitApiBtn = document.getElementById("submit-api")
+  const modalTitle = document.getElementById("modal-title")
+  const apiMethod = document.getElementById("api-method")
+  const apiDescription = document.getElementById("api-description")
+  const paramsContainer = document.getElementById("params-container")
+  const responseContainer = document.getElementById("response-container")
+  const responseData = document.getElementById("response-data")
+  const responseStatus = document.getElementById("response-status")
+  const responseTime = document.getElementById("response-time")
+  const responseActions = document.getElementById("response-actions")
+  const endpointDisplay = document.getElementById("endpoint-display")
+  const endpointUrl = document.getElementById("endpoint-url")
+  const copyEndpointBtn = document.getElementById("copy-endpoint")
+
+  // Reset modal state
+  responseContainer.classList.add("hidden")
+  endpointDisplay.classList.add("hidden")
+  responseData.innerHTML = ""
+  responseActions.innerHTML = ""
+  submitApiBtn.classList.remove("hidden")
+  paramsContainer.classList.remove("hidden")
+  paramsContainer.innerHTML = ""
+
+  modalTitle.textContent = name
+  apiDescription.textContent = description || "No description available" // Fallback description
+  apiMethod.textContent = method
+
+  const url = new URL(endpoint, window.location.origin)
+  const urlParams = url.search ? url.search.substring(1).split("&") : []
+
+  if (urlParams.length) {
+    urlParams.forEach((param) => {
+      const [key] = param.split("=")
+      if (key) {
+        const isOptional = key.startsWith("_")
+        const placeholderText = `Enter ${key}${isOptional ? " (optional)" : ""}`
+
+        const paramField = document.createElement("div")
+        paramField.className = "mb-4"
+        paramField.innerHTML = `
+          <input type='text' id='param-${key}' class='w-full px-4 py-3 text-sm text-gray-200 bg-dark-700 border border-dark-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all duration-300' placeholder='${placeholderText}'>
+          <div id='error-${key}' class='text-red-400 text-xs mt-2 hidden'>This field is required</div>
+        `
+        paramsContainer.appendChild(paramField)
+      }
+    })
+  } else {
+    const placeholderMatch = endpoint.match(/{([^}]+)}/g)
+    if (placeholderMatch) {
+      placeholderMatch.forEach((match) => {
+        const paramName = match.replace(/{|}/g, "")
+        const isOptional = paramName.startsWith("_")
+        const placeholderText = `Enter ${paramName}${isOptional ? " (optional)" : ""}`
+
+        const paramField = document.createElement("div")
+        paramField.className = "mb-4"
+        paramField.innerHTML = `
+          <input type='text' id='param-${paramName}' class='w-full px-4 py-3 text-sm text-gray-200 bg-dark-700 border border-dark-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all duration-300' placeholder='${placeholderText}'>
+          <div id='error-${paramName}' class='text-red-400 text-xs mt-2 hidden'>This field is required</div>
+        `
+        paramsContainer.appendChild(paramField)
+      })
     }
-    
-    const pageLoader = document.getElementById('page-loader');
-    
-    window.addEventListener('load', function() {
-        setTimeout(function() {
-            const scrollPosition = parseInt(document.body.style.top || '0') * -1;
-            document.body.classList.remove('noscroll');
-            document.body.style.top = '';
-            window.scrollTo(0, scrollPosition);
-            pageLoader.style.opacity = '0';
-            setTimeout(function() {
-                pageLoader.style.display = 'none';
-            }, 800);
-        }, 1000);
-    });
-    
-    function showLoader() {
-        const scrollPosition = window.scrollY;
-        document.body.style.top = `-${scrollPosition}px`;
-        document.body.classList.add('noscroll');
-        pageLoader.style.display = 'flex';
-        pageLoader.style.opacity = '1';
+  }
+
+  // Show modal
+  modal.classList.add("show")
+  document.body.classList.add("modal-open")
+
+  // Setup copy endpoint button
+  copyEndpointBtn.addEventListener("click", async () => {
+    const success = await copyToClipboard(endpointUrl.textContent)
+    if (success) {
+      copyEndpointBtn.classList.add("copied")
+      copyEndpointBtn.querySelector(".tooltip-text").textContent = "Copied!"
+      showToast("Endpoint copied to clipboard", "success")
+
+      setTimeout(() => {
+        copyEndpointBtn.classList.remove("copied")
+        copyEndpointBtn.querySelector(".tooltip-text").textContent = "Copy to clipboard"
+      }, 2000)
+    } else {
+      showToast("Failed to copy endpoint", "error")
     }
-    
-    function hideLoader() {
-        setTimeout(function() {
-            const scrollPosition = parseInt(document.body.style.top || '0') * -1;
-            document.body.classList.remove('noscroll');
-            document.body.style.top = '';
-            window.scrollTo(0, scrollPosition);
-            pageLoader.style.opacity = '0';
-            setTimeout(function() {
-                pageLoader.style.display = 'none';
-            }, 800);
-        }, 1000);
+  })
+
+  const closeModal = () => {
+    modal.classList.remove("show")
+    document.body.classList.remove("modal-open")
+
+    // Reset modal scroll position
+    setTimeout(() => {
+      modalContent.scrollTop = 0
+    }, 300)
+  }
+
+  closeModalBtn.onclick = closeModal
+
+  // Close modal when clicking outside
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeModal()
     }
-    
-    function setupApiContent(gtw) {
-        const apiContent = document.getElementById('api-content');
-        gtw.endpoints.forEach(category => {
-            const categoryHeader = document.createElement('h3');
-            categoryHeader.className = 'mb-4 text-xl font-semibold';
-            categoryHeader.textContent = category.name;
-            apiContent.appendChild(categoryHeader);
-    
-            const row = document.createElement('div');
-            row.className = 'row';
-            apiContent.appendChild(row);
-    
-            const sortedItems = Object.entries(category.items)
-                .sort(([, a], [, b]) => (a.name || '').localeCompare(b.name || ''))
-                .map(([,item]) => item);
-            
-            sortedItems.forEach((itemData, index) => {
-                const itemName = Object.keys(itemData)[0];
-                const item = itemData[itemName];
-                const isLastItem = index === sortedItems.length - 1;
-                const itemElement = createApiItemElement(itemName, item, isLastItem);
-                row.appendChild(itemElement);
-            });
-        });
+  })
+
+  // Close modal with Escape key
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && modal.classList.contains("show")) {
+      closeModal()
     }
-    
-    function createApiItemElement(itemName, item, isLastItem) {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = `w-full ${isLastItem ? 'mb-5' : 'mb-2'}`;
-        itemDiv.dataset.name = itemName || '';
-        itemDiv.dataset.desc = item.desc || '';
-    
-        const heroSection = document.createElement('div');
-        heroSection.className = 'flex items-center justify-between p-4 px-6 bg-gray-50 shadow-sm h-20';
-    
-        const textContent = document.createElement('div');
-        textContent.className = 'flex-grow mr-4 overflow-hidden';
-        
-        const title = document.createElement('h5');
-        title.className = 'text-lg font-semibold text-gray-600 truncate';
-        title.textContent = itemName || 'Unnamed Item';
-    
-        const description = document.createElement('p');
-        description.className = 'text-xs font-medium text-gray-600 truncate';
-        description.textContent = item.desc || 'No description';
-    
-        textContent.appendChild(title);
-        textContent.appendChild(description);
-    
-        const button = document.createElement('button');
-        button.className = 'px-4 py-2 text-sm font-medium text-white bg-gray-800 w-13 h-9 flex items-center justify-center hover:bg-gray-700 transition duration-300 flex-shrink-0 get-api-btn';
-        button.dataset.apiPath = item.path || '';
-        button.dataset.apiName = itemName || '';
-        button.dataset.apiDesc = item.desc || '';
-        button.textContent = 'TRY';
-    
-        heroSection.appendChild(textContent);
-        heroSection.appendChild(button);
-        itemDiv.appendChild(heroSection);
-    
-        return itemDiv;
-    }
-    
-    function setupApiButtonHandlers(gtw) {
-        document.addEventListener('click', event => {
-            if (event.target.classList.contains('get-api-btn')) {
-                const { apiPath, apiName, apiDesc } = event.target.dataset;
-    
-                const currentItem = gtw.endpoints
-                    .flatMap(category => Object.values(category.items))
-                    .map(itemData => {
-                        const itemName = Object.keys(itemData)[0];
-                        return { name: itemName, ...itemData[itemName] };
-                    })
-                    .find(item => item.path === apiPath && item.name === apiName);
-    
-                openApiModal(apiName, apiPath, apiDesc);
-            }
-        });
-    }
-    
-    function setupSearchFunctionality() {
-        const searchInput = document.getElementById('api-search');
-        if (!searchInput) return;
-        
-        let originalData = null;
-        
-        function captureOriginalData() {
-            const result = [];
-            const categories = document.querySelectorAll('#api-content h3');
-            
-            categories.forEach(category => {
-                const nextElement = category.nextElementSibling;
-                if (nextElement && nextElement.classList.contains('row')) {
-                    const items = Array.from(nextElement.querySelectorAll('div[data-name]')).map(item => {
-                        return {
-                            element: item.cloneNode(true),
-                            name: item.dataset.name,
-                            desc: item.dataset.desc
-                        };
-                    });
-                    
-                    result.push({
-                        categoryElement: category,
-                        rowElement: nextElement,
-                        items: items
-                    });
-                }
-            });
-            
-            return result;
-        }
-        
-        function restoreOriginalData() {
-            if (!originalData) return;
-            
-            originalData.forEach(categoryData => {
-                categoryData.categoryElement.classList.remove('hidden');
-                const row = categoryData.rowElement;
-                row.innerHTML = '';
-                
-                categoryData.items.forEach((item, index) => {
-                    const newItem = item.element.cloneNode(true);
-                    newItem.className = index === categoryData.items.length - 1 ? 'w-full mb-5' : 'w-full mb-2';
-                    row.appendChild(newItem);
-                });
-            });
-        }
-        
-        originalData = captureOriginalData();
-        
-        searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            
-            if (!searchTerm) {
-                restoreOriginalData();
-                return;
-            }
-            
-            const categories = document.querySelectorAll('#api-content h3');
-            
-            categories.forEach(category => {
-                category.classList.remove('hidden');
-            });
-            
-            categories.forEach(category => {
-                const nextElement = category.nextElementSibling;
-                if (nextElement && nextElement.classList.contains('row')) {
-                    const row = nextElement;
-                    
-                    const originalCategoryData = originalData.find(data => data.categoryElement === category);
-                    if (!originalCategoryData) return;
-                    
-                    const visibleItems = [];
-                    
-                    originalCategoryData.items.forEach(item => {
-                        const title = item.name?.toLowerCase() || '';
-                        const desc = item.desc?.toLowerCase() || '';
-                        
-                        if (title.includes(searchTerm) || desc.includes(searchTerm)) {
-                            visibleItems.push(item);
-                        }
-                    });
-                    
-                    if (visibleItems.length === 0) {
-                        category.classList.add('hidden');
-                        row.innerHTML = '';
-                        return;
-                    }
-                    
-                    row.innerHTML = '';
-                    visibleItems.forEach((item, index) => {
-                        const newItem = item.element.cloneNode(true);
-                        
-                        newItem.className = 'w-full mb-2';
-                        
-                        if (index === visibleItems.length - 1) {
-                            newItem.className = 'w-full mb-5';
-                        }
-                        
-                        const button = newItem.querySelector('.get-api-btn');
-                        if (button) {
-                            button.dataset.apiPath = item.element.querySelector('.get-api-btn')?.dataset.apiPath || '';
-                            button.dataset.apiName = item.element.querySelector('.get-api-btn')?.dataset.apiName || '';
-                            button.dataset.apiDesc = item.element.querySelector('.get-api-btn')?.dataset.apiDesc || '';
-                        }
-                        
-                        row.appendChild(newItem);
-                    });
-                }
-            });
-        });
-    }
-    
-    function openApiModal(name, endpoint, description, method) {
-        const modal = document.getElementById('api-modal');
-        const modalBackdrop = modal.querySelector('.fixed.inset-0.bg-black');
-        const modalContent = modal.querySelector('.relative.z-10');
-        const closeModalBtn = document.getElementById('close-modal');
-        const submitApiBtn = document.getElementById('submit-api');
-        const modalTitle = document.getElementById('modal-title');
-        const apiMethod = document.getElementById('api-method');
-        const apiDescription = document.getElementById('api-description');
-        const paramsContainer = document.getElementById('params-container');
-        const responseContainer = document.getElementById('response-container');
-        const responseData = document.getElementById('response-data');
-        const responseStatus = document.getElementById('response-status');
-        const responseTime = document.getElementById('response-time');
-        const existingUrlDisplay = document.querySelector('.urlDisplay');
-        
-        if (existingUrlDisplay) {
-            existingUrlDisplay.remove();
-        }
-        responseContainer.classList.add('hidden');
-        responseData.innerHTML = '';
-        submitApiBtn.classList.remove('hidden');
-        paramsContainer.classList.remove('hidden');
-        paramsContainer.innerHTML = '';
-        
-        modalTitle.textContent = name;
-        apiDescription.textContent = description;
-        
-        const url = new URL(endpoint, window.location.origin);
-        const urlParams = url.search ? url.search.substring(1).split('&') : [];
-        if (urlParams.length) {
-            urlParams.forEach(param => {
-                const [key] = param.split('=');
-                if (key) {
-                    const isOptional = key.startsWith('_');
-                    const placeholderText = `Enter ${key}${isOptional ? ' (optional)' : ''}`;
-                    
-                    const paramField = document.createElement('div');
-                    paramField.className = 'mb-3';
-                    paramField.innerHTML = `
-                        <input type='text' id='param-${key}' class='w-full px-3 py-1.5 text-sm text-gray-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-transparent' placeholder='${placeholderText}'>
-                        <div id='error-${key}' class='text-red-500 text-xs mt-1 hidden'>This field is required</div>
-                    `;
-                    paramsContainer.appendChild(paramField);
-                }
-            });
+  })
+
+  submitApiBtn.onclick = async () => {
+    let isValid = true
+
+    document.querySelectorAll('[id^="error-"]').forEach((errorElement) => {
+      errorElement.classList.add("hidden")
+    })
+
+    if (paramsContainer.children.length > 0) {
+      Array.from(paramsContainer.children).forEach((paramDiv) => {
+        const input = paramDiv.querySelector("input")
+        const paramName = input.id.replace("param-", "")
+        const paramValue = input.value.trim()
+        const errorElement = document.getElementById(`error-${paramName}`)
+
+        if (!paramName.startsWith("_") && paramValue === "") {
+          isValid = false
+          errorElement.classList.remove("hidden")
+          input.classList.add("border-red-500")
         } else {
-            const placeholderMatch = endpoint.match(/{([^}]+)}/g);
-            if (placeholderMatch) {
-                placeholderMatch.forEach(match => {
-                    const paramName = match.replace(/{|}/g, '');
-                    const isOptional = paramName.startsWith('_');
-                    const placeholderText = `Enter ${paramName}${isOptional ? ' (optional)' : ''}`;
-                    
-                    const paramField = document.createElement('div');
-                    paramField.className = 'mb-3';
-                    paramField.innerHTML = `
-                        <input type='text' id='param-${paramName}' class='w-full px-3 py-1.5 text-sm text-gray-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-transparent' placeholder='${placeholderText}'>
-                        <div id='error-${paramName}' class='text-red-500 text-xs mt-1 hidden'>This field is required</div>
-                    `;
-                    paramsContainer.appendChild(paramField);
-                });
-            }
+          input.classList.remove("border-red-500")
         }
-        
-        modal.classList.remove('hidden');
-        document.body.classList.add('noscroll');
-        
-        modal.offsetWidth;
-        
-        modal.classList.add('opacity-100');
-        modalBackdrop.classList.add('opacity-50');
-        modalContent.classList.add('scale-100', 'opacity-100');
-        
-        const closeModal = function() {
-            modal.classList.remove('opacity-100');
-            modalBackdrop.classList.remove('opacity-50');
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                document.body.classList.remove('noscroll');
-            }, 300);
-        };
-        
-        closeModalBtn.onclick = closeModal;
-        
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                closeModal();
-            }
-        });
-        
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal();
-            }
-        }, { once: true });
-        
-        submitApiBtn.onclick = async function() {
-            let isValid = true;
-            
-            document.querySelectorAll('[id^="error-"]').forEach(errorElement => {
-                errorElement.classList.add('hidden');
-            });
-            
-            if (paramsContainer.children.length > 0) {
-                Array.from(paramsContainer.children).forEach(paramDiv => {
-                    const input = paramDiv.querySelector('input');
-                    const paramName = input.id.replace('param-', '');
-                    const paramValue = input.value.trim();
-                    const errorElement = document.getElementById(`error-${paramName}`);
-                    
-                    if (!paramName.startsWith('_') && paramValue === '') {
-                        isValid = false;
-                        errorElement.classList.remove('hidden');
-                        input.classList.add('border-red-500');
-                    } else {
-                        input.classList.remove('border-red-500');
-                    }
-                });
-            }
-            
-            if (!isValid) {
-                return;
-            }
-            
-            responseContainer.classList.remove('hidden');
-            paramsContainer.classList.add('hidden');
-            submitApiBtn.classList.add('hidden');
-            
-            const startTime = Date.now();
-            try {
-                let apiUrl = endpoint;
-                
-                if (paramsContainer.children.length > 0) {
-                    Array.from(paramsContainer.children).forEach(paramDiv => {
-                        const input = paramDiv.querySelector('input');
-                        const paramName = input.id.replace('param-', '');
-                        const paramValue = input.value;
-                        
-                        if (paramName.startsWith('_') && paramValue === '') {
-                            return;
-                        }
-                        
-                        if (apiUrl.includes(`{${paramName}}`)) {
-                            apiUrl = apiUrl.replace(`{${paramName}}`, encodeURIComponent(paramValue));
-                        } 
-                        else {
-                            const urlObj = new URL(apiUrl, window.location.origin);
-                            urlObj.searchParams.set(paramName, paramValue);
-                            apiUrl = urlObj.pathname + urlObj.search;
-                        }
-                    });
-                }
-                const fullUrl = new URL(apiUrl, window.location.origin).href;
-                
-                const urlDisplayDiv = document.createElement('div');
-                urlDisplayDiv.className = 'urlDisplay mb-4 p-3 bg-gray-50 font-mono text-xs overflow-hidden';
-                
-                const urlContent = document.createElement('div');
-                urlContent.className = 'break-all';
-                urlContent.textContent = fullUrl;
-                urlDisplayDiv.appendChild(urlContent);
-                
-                responseContainer.parentNode.insertBefore(urlDisplayDiv, responseContainer);
-                
-                responseData.innerHTML = 'Loading...';
-                
-                const requestOptions = {
-                    method: 'get',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                };
-                
-                const response = await fetch(apiUrl, requestOptions);
-                const endTime = Date.now();
-                const duration = endTime - startTime;
-                
-                responseStatus.textContent = response.status;
-                responseStatus.className = response.ok 
-                    ? 'px-2 py-1 text-xs font-medium bg-green-100 text-green-800 mr-2'
-                    : 'px-2 py-1 text-xs font-medium bg-red-100 text-red-800 mr-2';
-                
-                responseTime.textContent = `${duration}ms`;
-                
-                const contentType = response.headers.get('content-type');
-                
-                if (contentType && (
-                    contentType.includes('image/') || 
-                    contentType.includes('video/') || 
-                    contentType.includes('audio/') ||
-                    contentType.includes('application/octet-stream')
-                )) {
-                    const blob = await response.blob();
-                    const objectUrl = URL.createObjectURL(blob);
-                    
-                    if (contentType.includes('image/')) {
-                        responseData.innerHTML = `<img src='${objectUrl}' alt='Response Image' class='max-w-full h-auto' />`;
-                    } else if (contentType.includes('video/')) {
-                        responseData.innerHTML = `
-                            <video controls class='max-w-full'>
-                                <source src='${objectUrl}' type='${contentType}'>
-                                Your browser does not support the video tag.
-                            </video>`;
-                    } else if (contentType.includes('audio/')) {
-                        responseData.innerHTML = `
-                            <audio controls class='w-full'>
-                                <source src='${objectUrl}' type='${contentType}'>
-                                Your browser does not support the audio tag.
-                            </audio>`;
-                    } else {
-                        responseData.innerHTML = `
-                            <div class='text-center p-4'>
-                                <p class='mb-2'>Binary data received (${blob.size} bytes)</p>
-                                <a href='${objectUrl}' download='response-data' class='px-4 py-2 bg-blue-500 text-white hover:bg-blue-600'>Download File</a>
-                            </div>`;
-                    }
-                } else if (contentType && contentType.includes('application/json')) {
-                    const data = await response.json();
-                    const responseText = JSON.stringify(data, null, 2);
-                    responseData.innerHTML = `<pre class='whitespace-pre-wrap break-words'>${responseText}</pre>`;
-                } else {
-                    const responseText = await response.text();
-                    responseData.innerHTML = `<pre class='whitespace-pre-wrap break-words'>${responseText}</pre>`;
-                }
-            } catch (error) {
-                const endTime = Date.now();
-                const duration = endTime - startTime;
-                
-                responseStatus.textContent = 'Error';
-                responseStatus.className = 'px-2 py-1 text-xs font-medium bg-red-100 text-red-800 mr-2';
-                responseTime.textContent = `${duration}ms`;
-                responseData.innerHTML = `<pre class='text-red-500'>${error.message}</pre>`;
-            }
-        };
+      })
     }
-});
+
+    if (!isValid) {
+      return
+    }
+
+    // Show loading state
+    submitApiBtn.disabled = true
+    submitApiBtn.innerHTML = `
+      <span class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></span>
+      Processing...
+    `
+
+    let apiUrl = endpoint
+
+    if (paramsContainer.children.length > 0) {
+      Array.from(paramsContainer.children).forEach((paramDiv) => {
+        const input = paramDiv.querySelector("input")
+        const paramName = input.id.replace("param-", "")
+        const paramValue = input.value
+
+        if (paramName.startsWith("_") && paramValue === "") {
+          return
+        }
+
+        if (apiUrl.includes(`{${paramName}}`)) {
+          apiUrl = apiUrl.replace(`{${paramName}}`, encodeURIComponent(paramValue))
+        } else {
+          const urlObj = new URL(apiUrl, window.location.origin)
+          urlObj.searchParams.set(paramName, paramValue)
+          apiUrl = urlObj.pathname + urlObj.search
+        }
+      })
+    }
+
+    const fullUrl = new URL(apiUrl, window.location.origin).href
+
+    // Display endpoint URL
+    endpointDisplay.classList.remove("hidden")
+    endpointUrl.textContent = fullUrl
+
+    responseContainer.classList.remove("hidden")
+    paramsContainer.classList.add("hidden")
+    submitApiBtn.classList.add("hidden")
+
+    const startTime = Date.now()
+    try {
+      responseData.innerHTML = `
+        <div class="flex items-center justify-center p-4">
+          <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent-purple"></div>
+        </div>
+      `
+
+      const requestOptions = {
+        method: method.toLowerCase(),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+
+      const response = await fetch(fullUrl, requestOptions)
+      const endTime = Date.now()
+      const duration = endTime - startTime
+
+      responseStatus.textContent = response.status
+      responseStatus.className = response.ok
+        ? "px-2.5 py-1 text-xs font-medium bg-green-900 text-green-200 rounded-full mr-2"
+        : "px-2.5 py-1 text-xs font-medium bg-red-900 text-red-200 rounded-full mr-2"
+
+      responseTime.textContent = `${duration}ms`
+      responseActions.innerHTML = ""
+
+      const contentType = response.headers.get("content-type")
+
+      if (
+        contentType &&
+        (contentType.includes("image/") ||
+          contentType.includes("video/") ||
+          contentType.includes("audio/") ||
+          contentType.includes("application/octet-stream"))
+      ) {
+        const blob = await response.blob()
+        const objectUrl = URL.createObjectURL(blob)
+
+        if (contentType.includes("image/")) {
+          responseData.innerHTML = `<img src='${objectUrl}' alt='Response Image' class='max-w-full h-auto rounded-lg' />`
+        } else if (contentType.includes("video/")) {
+          responseData.innerHTML = `
+            <video controls class='max-w-full rounded-lg'>
+              <source src='${objectUrl}' type='${contentType}'>
+              Your browser does not support the video tag.
+            </video>`
+        } else if (contentType.includes("audio/")) {
+          responseData.innerHTML = `
+            <audio controls class='w-full'>
+              <source src='${objectUrl}' type='${contentType}'>
+              Your browser does not support the audio tag.
+            </audio>`
+        } else {
+          responseData.innerHTML = `
+            <div class='text-center p-6'>
+              <p class='mb-3 text-gray-300'>Binary data received (${blob.size} bytes)</p>
+            </div>`
+        }
+
+        // Add download button for media
+        const downloadButton = createDownloadButton(objectUrl, `response-${Date.now()}`)
+        responseActions.appendChild(downloadButton)
+      } else if (contentType && contentType.includes("application/json")) {
+        const data = await response.json()
+        const formattedJson = syntaxHighlight(JSON.stringify(data, null, 2))
+        responseData.innerHTML = `<div class='whitespace-pre-wrap break-words'>${formattedJson}</div>`
+
+        // Add copy button for JSON
+        const copyButton = createCopyButton()
+        copyButton.addEventListener("click", async () => {
+          const success = await copyToClipboard(JSON.stringify(data, null, 2))
+          if (success) {
+            copyButton.classList.add("copied")
+            copyButton.querySelector(".tooltip-text").textContent = "Copied!"
+            showToast("Response copied to clipboard", "success")
+
+            setTimeout(() => {
+              copyButton.classList.remove("copied")
+              copyButton.querySelector(".tooltip-text").textContent = "Copy to clipboard"
+            }, 2000)
+          } else {
+            showToast("Failed to copy response", "error")
+          }
+        })
+        responseActions.appendChild(copyButton)
+      } else {
+        const responseText = await response.text()
+        responseData.innerHTML = `<pre class='whitespace-pre-wrap break-words text-gray-300'>${responseText}</pre>`
+
+        // Add copy button for text
+        const copyButton = createCopyButton()
+        copyButton.addEventListener("click", async () => {
+          const success = await copyToClipboard(responseText)
+          if (success) {
+            copyButton.classList.add("copied")
+            copyButton.querySelector(".tooltip-text").textContent = "Copied!"
+            showToast("Response copied to clipboard", "success")
+
+            setTimeout(() => {
+              copyButton.classList.remove("copied")
+              copyButton.querySelector(".tooltip-text").textContent = "Copy to clipboard"
+            }, 2000)
+          } else {
+            showToast("Failed to copy response", "error")
+          }
+        })
+        responseActions.appendChild(copyButton)
+      }
+    } catch (error) {
+      const endTime = Date.now()
+      const duration = endTime - startTime
+
+      responseStatus.textContent = "Error"
+      responseStatus.className = "px-2.5 py-1 text-xs font-medium bg-red-900 text-red-200 rounded-full mr-2"
+      responseTime.textContent = `${duration}ms`
+      responseData.innerHTML = `<pre class='text-red-400'>${error.message}</pre>`
+
+      // Add copy button for error
+      const copyButton = createCopyButton()
+      copyButton.addEventListener("click", async () => {
+        const success = await copyToClipboard(error.message)
+        if (success) {
+          showToast("Error message copied to clipboard", "success")
+        } else {
+          showToast("Failed to copy error message", "error")
+        }
+      })
+      responseActions.appendChild(copyButton)
+    } finally {
+      submitApiBtn.disabled = false
+      submitApiBtn.textContent = "Send Request"
+    }
+  }
+}
+
+// Function to add syntax highlighting to JSON
+function syntaxHighlight(json) {
+  json = json.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">")
+  return json.replace(
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
+    (match) => {
+      let cls = "text-amber-400" // number
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = "text-blue-400" // key
+        } else {
+          cls = "text-green-400" // string
+        }
+      } else if (/true|false/.test(match)) {
+        cls = "text-accent-purple" // boolean
+      } else if (/null/.test(match)) {
+        cls = "text-accent-pink" // null
+      }
+      return '<span class="' + cls + '">' + match + "</span>"
+    },
+  )
+}

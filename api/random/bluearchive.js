@@ -1,21 +1,29 @@
+// blue-archive.js
 const axios = require('axios');
 
-module.exports = {
+const meta = {
     name: 'Blue Archive',
     desc: 'Blue archive random image',
     category: 'Random',
-    async run(req, res) {
-        try {
-            const { data } = await axios.get(`https://raw.githubusercontent.com/rynxzyy/blue-archive-r-img/refs/heads/main/links.json`)
-            const response = await axios.get(data[Math.floor(data.length * Math.random())], { responseType: 'arraybuffer' });
-            const pedo = Buffer.from(response.data);
-            res.writeHead(200, {
-                'Content-Type': 'image/png',
-                'Content-Length': pedo.length,
-            });
-            res.end(pedo);
-        } catch (error) {
-            res.status(500).json({ status: false, error: error.message });
-        }
-    }
 };
+
+async function onStart({ req, res }) {
+    try {
+        const { data } = await axios.get(
+            'https://raw.githubusercontent.com/rynxzyy/blue-archive-r-img/refs/heads/main/links.json'
+        );
+        // pick a random URL from the array
+        const imageUrl = data[Math.floor(Math.random() * data.length)];
+        const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+        const imgBuffer = Buffer.from(response.data);
+        res.writeHead(200, {
+            'Content-Type': 'image/png',
+            'Content-Length': imgBuffer.length,
+        });
+        res.end(imgBuffer);
+    } catch (error) {
+        res.status(500).json({ status: false, error: error.message });
+    }
+}
+
+module.exports = { meta, onStart };
