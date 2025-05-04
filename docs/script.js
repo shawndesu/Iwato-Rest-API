@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Setup components
     setupApiContent(endpoints)
     setupApiButtonHandlers(endpoints)
-    setupSearchFunctionality()
+    setupSearchFunctionality(endpoints)
     setupNavigation()
     updateStats(endpoints)
     setupNotifications(set.notification)
@@ -505,117 +505,184 @@ function setupApiButtonHandlers(endpoints) {
   })
 }
 
-function setupSearchFunctionality() {
-  const searchInput = document.getElementById("api-search")
-  if (!searchInput) return
+function setupSearchFunctionality(endpoints) {
+  const searchInput = document.getElementById("api-search");
+  const clearSearchBtn = document.getElementById("clear-search");
+  const searchResultsContainer = document.getElementById("search-results-container");
+  const searchResults = document.getElementById("search-results");
+  const noResults = document.getElementById("no-results");
+  
+  if (!searchInput || !searchResultsContainer || !searchResults || !noResults || !clearSearchBtn) {
+    console.error("Search elements not found in the DOM");
+    return;
+  }
 
-  let originalData = null
+  let originalData = null;
 
   function captureOriginalData() {
-    const result = []
-    const categories = document.querySelectorAll("#api-content h3")
+    const result = [];
+    const categories = document.querySelectorAll("#api-content h3");
 
     categories.forEach((category) => {
-      const nextElement = category.nextElementSibling
+      const nextElement = category.nextElementSibling;
       if (nextElement && nextElement.classList.contains("row")) {
         const items = Array.from(nextElement.querySelectorAll("div[data-name]")).map((item) => {
           return {
             element: item.cloneNode(true),
             name: item.dataset.name,
-            desc: item.dataset.desc || "No description available", // Fallback description
-          }
-        })
+            desc: item.dataset.desc || "No description available",
+          };
+        });
 
         result.push({
           categoryElement: category,
           rowElement: nextElement,
           items: items,
-        })
+        });
       }
-    })
+    });
 
-    return result
+    return result;
   }
 
   function restoreOriginalData() {
-    if (!originalData) return
+    if (!originalData) return;
 
     originalData.forEach((categoryData) => {
-      categoryData.categoryElement.classList.remove("hidden")
-      const row = categoryData.rowElement
-      row.innerHTML = ""
+      categoryData.categoryElement.classList.remove("hidden");
+      const row = categoryData.rowElement;
+      row.innerHTML = "";
 
       categoryData.items.forEach((item, index) => {
-        const newItem = item.element.cloneNode(true)
-        newItem.className = index === categoryData.items.length - 1 ? "w-full mb-8" : "w-full mb-4"
-        row.appendChild(newItem)
-      })
-    })
+        const newItem = item.element.cloneNode(true);
+        newItem.className = index === categoryData.items.length - 1 ? "w-full mb-8" : "w-full mb-4";
+        row.appendChild(newItem);
+      });
+    });
   }
 
-  originalData = captureOriginalData()
-
-  searchInput.addEventListener("input", (e) => {
-    const searchTerm = e.target.value.toLowerCase().trim()
-
-    if (!searchTerm) {
-      restoreOriginalData()
-      return
-    }
-
-    const categories = document.querySelectorAll("#api-content h3")
-
-    categories.forEach((category) => {
-      category.classList.remove("hidden")
-    })
-
-    categories.forEach((category) => {
-      const nextElement = category.nextElementSibling
-      if (nextElement && nextElement.classList.contains("row")) {
-        const row = nextElement
-
-        const originalCategoryData = originalData.find((data) => data.categoryElement === category)
-        if (!originalCategoryData) return
-
-        const visibleItems = []
-
-        originalCategoryData.items.forEach((item) => {
-          const title = item.name?.toLowerCase() || ""
-          const desc = item.desc?.toLowerCase() || ""
-
-          if (title.includes(searchTerm) || desc.includes(searchTerm)) {
-            visibleItems.push(item)
-          }
-        })
-
-        if (visibleItems.length === 0) {
-          category.classList.add("hidden")
-          row.innerHTML = ""
-          return
-        }
-
-        row.innerHTML = ""
-        visibleItems.forEach((item, index) => {
-          const newItem = item.element.cloneNode(true)
-
-          newItem.className = "w-full mb-4"
-
-          if (index === visibleItems.length - 1) {
-            newItem.className = "w-full mb-8"
-          }
-
-          const button = newItem.querySelector(".get-api-btn")
-          if (button) {
-            button.dataset.apiPath = item.element.querySelector(".get-api-btn")?.dataset.apiPath || ""
-            button.dataset.apiName = item.element.querySelector(".get-api-btn")?.dataset.apiName || ""
-            button.dataset.apiDesc = item.element.querySelector(".get-api-btn")?.dataset.apiDesc || "No description available" // Fallback description
-          }
-
-          row.appendChild(newItem)
-        })
+  // Extract API data from endpoints for search
+  function extractApiData(endpoints) {
+    if (!endpoints || !endpoints.endpoints) return [];
+    
+    const apiData = [];
+    endpoints.endpoints.forEach(category => {
+      if (category.items) {
+        Object.entries(category.items).forEach(([key, itemData]) => {
+          const itemName = Object.keys(itemData)[0];
+          const item = itemData[itemName];
+          apiData.push({
+            id: key,
+            title: itemName,
+            path: item.path || '',
+            description: item.desc || 'No description available'
+          });
+        });
       }
-    })
-  })
+    });
+    
+    return apiData;
+  }
+
+  // Highlight matching text
+  function highlightMatch(text, query) {
+    if (!text) return '';
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(regex, '<span class="search-highlight">$1</span>');
+  }
+
+  // Perform search
+  function performSearch(query) {
+    if (!query) {
+      searchResultsContainer.classList.add("hidden");
+      return;
+    }
+    
+    query = query.toLowerCase();
+    
+    // Use the extracted API data or fall back to original data
+    const apiData = extractApiData(endpoints);
+    
+    const results = apiData.filter(item => 
+      (item.title && item.title.toLowerCase().includes(query)) || 
+      (item.path && item.path.toLowerCase().includes(query)) || 
+      (item.description && item.description.toLowerCase().includes(query))
+    );
+    
+    searchResults.innerHTML = '';
+    
+    if (results.length === 0) {
+      searchResults.classList.add('hidden');
+      noResults.classList.remove('hidden');
+    } else {
+      searchResults.classList.remove('hidden');
+      noResults.classList.add('hidden');
+      
+      results.forEach(result => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'search-result-item';
+        
+        // Highlight the matching text
+        const titleWithHighlight = highlightMatch(result.title, query);
+        const pathWithHighlight = highlightMatch(result.path, query);
+        
+        resultItem.innerHTML = `
+          <div class="result-title">${titleWithHighlight}</div>
+          <div class="result-path">${pathWithHighlight}</div>
+        `;
+        
+        resultItem.addEventListener('click', () => {
+          // Handle click on search result - navigate to the API or show modal
+          const apiButton = document.querySelector(`.get-api-btn[data-api-name="${result.title}"]`);
+          if (apiButton) {
+            apiButton.click();
+          } else {
+            console.log(`Selected: ${result.title}`);
+          }
+          searchResultsContainer.classList.add('hidden');
+        });
+        
+        searchResults.appendChild(resultItem);
+      });
+    }
+    
+    searchResultsContainer.classList.remove('hidden');
+  }
+
+  originalData = captureOriginalData();
+
+  // Event listeners
+  searchInput.addEventListener("input", function() {
+    performSearch(this.value.trim());
+  });
+  
+  clearSearchBtn.addEventListener("click", function() {
+    searchInput.value = '';
+    searchResultsContainer.classList.add('hidden');
+    searchInput.focus();
+    restoreOriginalData();
+  });
+  
+  // Close search results when clicking outside
+  document.addEventListener("click", function(event) {
+    if (!searchResultsContainer.contains(event.target) && event.target !== searchInput) {
+      searchResultsContainer.classList.add('hidden');
+    }
+  });
+  
+  // Focus search with keyboard shortcut (Ctrl+K or Command+K)
+  document.addEventListener("keydown", function(event) {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+      event.preventDefault();
+      searchInput.focus();
+    }
+    
+    // Close search results with Escape key
+    if (event.key === 'Escape' && !searchResultsContainer.classList.contains('hidden')) {
+      searchResultsContainer.classList.add('hidden');
+      searchInput.blur();
+    }
+  });
 }
 
 // Copy to clipboard function

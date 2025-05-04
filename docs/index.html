@@ -541,6 +541,98 @@
             width: 24px;
             height: 24px;
         }
+
+        /* API Logo styles */
+        .api-logo {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #6366F1, #8B5CF6, #EC4899);
+            border-radius: 9999px;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+            padding: 6px;
+        }
+
+        .api-logo svg {
+            width: 100%;
+            height: 100%;
+            fill: white;
+        }
+
+        /* Premium Search Bar Styles */
+        #api-search {
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        #api-search:focus {
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #api-search:focus + div svg {
+            color: #6366F1;
+        }
+
+        #api-search:not(:placeholder-shown) + div + #clear-search {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #search-results-container {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+            animation: fadeInDown 0.3s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-result-item {
+            padding: 10px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .search-result-item:hover {
+            background-color: #2A2A2A;
+            border-left-color: #6366F1;
+        }
+
+        .search-result-item .result-title {
+            font-weight: 500;
+            color: white;
+            margin-bottom: 2px;
+        }
+
+        .search-result-item .result-path {
+            font-size: 0.75rem;
+            color: #9CA3AF;
+        }
+
+        .search-highlight {
+            color: #6366F1;
+            font-weight: 500;
+        }
+
+        #no-results {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-dark-900 text-gray-200 min-h-screen transition-all duration-300">
@@ -559,8 +651,10 @@
     <aside class="fixed top-0 left-0 h-full w-64 bg-dark-800 border-r border-dark-600 shadow-premium z-30 transform transition-transform duration-300 ease-in-out" id="sidebar">
         <div class="p-4 border-b border-dark-600">
             <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-r from-accent-primary via-accent-purple to-accent-pink flex items-center justify-center shadow-glow">
-                    <span class="text-white font-bold text-base">API</span>
+                <div class="api-logo">
+                    <svg viewBox="0 0 122.88 91.26" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.32,0h106.24c4.58,0,8.32,3.74,8.32,8.32v74.62c0,4.57-3.74,8.32-8.32,8.32H8.32C3.74,91.26,0,87.51,0,82.94 V8.32C0,3.74,3.74,0,8.32,0L8.32,0z M43.7,64.74H32.8l-1.57,5.14H21.4l11.73-31.16h10.54l11.68,31.16H45.26L43.7,64.74L43.7,64.74z M41.67,58l-3.4-11.2L34.85,58H41.67L41.67,58z M59.15,38.72h16.02c3.49,0,6.1,0.83,7.84,2.49c1.73,1.66,2.6,4.03,2.6,7.09 c0,3.15-0.95,5.61-2.84,7.38c-1.89,1.78-4.79,2.66-8.68,2.66h-5.28v11.53h-9.66V38.72L59.15,38.72z M68.81,52.03h2.37 c1.87,0,3.18-0.33,3.94-0.97c0.75-0.65,1.13-1.47,1.13-2.48c0-0.98-0.33-1.81-0.99-2.49c-0.65-0.68-1.89-1.02-3.7-1.02h-2.76V52.03 L68.81,52.03z M91.82,38.72h9.66v31.16h-9.66V38.72L91.82,38.72z M117.97,23.29H5.29v60.46c0,0.64,0.25,1.2,0.67,1.63 c0.42,0.42,0.99,0.67,1.63,0.67h108.04c0.64,0,1.2-0.25,1.63-0.67c0.43-0.43,0.67-0.99,0.67-1.63V23.29H117.97L117.97,23.29z M106.64,9.35c2.27,0,4.11,1.84,4.11,4.11c0,2.27-1.84,4.11-4.11,4.11c-2.27,0-4.11-1.84-4.11-4.11 C102.54,11.19,104.38,9.35,106.64,9.35L106.64,9.35z M78.8,9.35c2.27,0,4.11,1.84,4.11,4.11c0,2.27-1.84,4.11-4.11,4.11 c-2.27,0-4.11-1.84-4.11-4.11C74.69,11.19,76.53,9.35,78.8,9.35L78.8,9.35z M92.72,9.35c2.27,0,4.11,1.84,4.11,4.11 c0,2.27-1.84,4.11-4.11,4.11c-2.27,0-4.11-1.84-4.11-4.11C88.61,11.19,90.45,9.35,92.72,9.35L92.72,9.35z"/>
+                    </svg>
                 </div>
                 <div>
                     <h1 id="sidebar-title" class="text-base font-bold text-white">API Documentation</h1>
@@ -664,13 +758,41 @@
 
                 <!-- Search Bar -->
                 <div class="relative w-full mb-6">
-                    <input 
-                        type="text" 
-                        id="api-search" 
-                        class="w-full px-4 py-3 text-sm text-gray-200 bg-dark-700 border border-dark-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent pl-10 transition-all duration-300" 
-                        placeholder="Search API...">
-                    <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">search</span>
-                </div>
+    <div class="relative">
+        <input 
+            type="text" 
+            id="api-search" 
+            class="w-full px-4 py-3.5 text-sm text-gray-200 bg-dark-700 border border-dark-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent pl-12 pr-10 transition-all duration-300 shadow-md" 
+            placeholder="Search API documentation...">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </div>
+        <button id="clear-search" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200 opacity-0 pointer-events-none">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+    <div id="search-results-container" class="hidden mt-2 bg-dark-800 border border-dark-600 rounded-lg shadow-premium overflow-hidden">
+        <div id="search-results" class="max-h-80 overflow-y-auto p-2">
+            <!-- Search results will be populated here -->
+        </div>
+        <div id="no-results" class="hidden p-6 text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-dark-700 mb-3">
+                <svg class="w-6 h-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-white mb-1">No results found</h3>
+            <p class="text-sm text-gray-400">Try adjusting your search or filter to find what you're looking for.</p>
+        </div>
+    </div>
+</div>
 
                 <!-- Separator Line -->
                 <div class="w-full h-px bg-dark-600 mb-6"></div>
@@ -773,5 +895,6 @@
     </div>
 
     <script src="/script.js"></script>
+    
 </body>
 </html>
