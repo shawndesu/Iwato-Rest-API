@@ -154,20 +154,23 @@
         /* Center notification badge on icon */
         .notification-badge {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 16px;
-            height: 16px;
+            top: -6px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
             background-color: #EF4444;
             color: white;
-            border-radius: 50%;
-            font-size: 9px;
+            border-radius: 9999px;
+            font-size: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 5;
+            border: 1.5px solid #0F0F0F;
+            line-height: 1;
         }
 
         /* Hide hamburger on desktop */
@@ -508,10 +511,12 @@
         /* Notification hover effect */
         #notification-button {
             position: relative;
+            z-index: 1;
+            overflow: visible;
         }
 
         #notification-button:hover .notification-badge {
-            transform: translate(-50%, -50%) scale(1.2);
+            transform: scale(1.1);
             transition: transform 0.2s ease;
         }
 
