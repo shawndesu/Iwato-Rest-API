@@ -664,7 +664,29 @@ function createDownloadButton(url, filename) {
   return button
 }
 
+// Store the page state before opening the modal
+let previousPageState = {
+  scrollPosition: 0,
+  activeTab: null,
+  searchValue: "",
+  activeElement: null
+};
+
 function openApiModal(name, endpoint, description, method = "GET") {
+  // Save the current page state before opening the modal
+  previousPageState = {
+    scrollPosition: window.scrollY,
+    activeTab: document.querySelector(".nav-link.bg-dark-700")?.getAttribute("data-page") || "home",
+    searchValue: document.getElementById("api-search")?.value || "",
+    activeElement: document.activeElement
+  };
+
+  // Prevent background scrolling by fixing the body position
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${previousPageState.scrollPosition}px`;
+  document.body.style.width = '100%';
+  document.body.style.overflow = 'hidden';
+
   const modal = document.getElementById("api-modal")
   const modalContent = modal.querySelector(".modal-content")
   const closeModalBtn = document.getElementById("close-modal")
@@ -735,7 +757,6 @@ function openApiModal(name, endpoint, description, method = "GET") {
 
   // Show modal
   modal.classList.add("show")
-  document.body.classList.add("modal-open")
 
   // Setup copy endpoint button
   copyEndpointBtn.addEventListener("click", async () => {
@@ -756,12 +777,44 @@ function openApiModal(name, endpoint, description, method = "GET") {
 
   const closeModal = () => {
     modal.classList.remove("show")
-    document.body.classList.remove("modal-open")
+
+    // Restore body position and scroll
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+
+    // Restore the page state to what it was before the modal was opened
+    if (previousPageState.activeTab) {
+      const tabToActivate = document.querySelector(`.nav-link[data-page="${previousPageState.activeTab}"]`);
+      if (tabToActivate && !tabToActivate.classList.contains("bg-dark-700")) {
+        tabToActivate.click();
+      }
+    }
+
+    if (previousPageState.searchValue) {
+      const searchInput = document.getElementById("api-search");
+      if (searchInput && searchInput.value !== previousPageState.searchValue) {
+        searchInput.value = previousPageState.searchValue;
+        // Trigger the input event to apply the search
+        searchInput.dispatchEvent(new Event('input'));
+      }
+    }
+
+    // Restore focus to the previously active element
+    if (previousPageState.activeElement) {
+      setTimeout(() => {
+        previousPageState.activeElement.focus();
+      }, 100);
+    }
+
+    // Restore scroll position
+    window.scrollTo(0, previousPageState.scrollPosition);
 
     // Reset modal scroll position
     setTimeout(() => {
-      modalContent.scrollTop = 0
-    }, 300)
+      modalContent.scrollTop = 0;
+    }, 100);
   }
 
   closeModalBtn.onclick = closeModal
@@ -789,17 +842,17 @@ function openApiModal(name, endpoint, description, method = "GET") {
 
     if (paramsContainer.children.length > 0) {
       Array.from(paramsContainer.children).forEach((paramDiv) => {
-        const input = paramDiv.querySelector("input")
-        const paramName = input.id.replace("param-", "")
-        const paramValue = input.value.trim()
+        const inputElement = paramDiv.querySelector("input")
+        const paramName = inputElement.id.replace("param-", "")
+        const paramValue = inputElement.value.trim()
         const errorElement = document.getElementById(`error-${paramName}`)
 
         if (!paramName.startsWith("_") && paramValue === "") {
           isValid = false
           errorElement.classList.remove("hidden")
-          input.classList.add("border-red-500")
+          inputElement.classList.add("border-red-500")
         } else {
-          input.classList.remove("border-red-500")
+          inputElement.classList.remove("border-red-500")
         }
       })
     }
@@ -819,9 +872,9 @@ function openApiModal(name, endpoint, description, method = "GET") {
 
     if (paramsContainer.children.length > 0) {
       Array.from(paramsContainer.children).forEach((paramDiv) => {
-        const input = paramDiv.querySelector("input")
-        const paramName = input.id.replace("param-", "")
-        const paramValue = input.value
+        const inputElement = paramDiv.querySelector("input")
+        const paramName = inputElement.id.replace("param-", "")
+        const paramValue = inputElement.value
 
         if (paramName.startsWith("_") && paramValue === "") {
           return
@@ -1001,7 +1054,7 @@ function syntaxHighlight(json) {
       } else if (/null/.test(match)) {
         cls = "text-accent-pink" // null
       }
-      return '<span class="' + cls + '">' + match + "</span>"
+      return '<span class="' + cls + '">' + match + '</span>'
     },
   )
 }

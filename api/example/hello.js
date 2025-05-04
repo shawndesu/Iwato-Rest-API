@@ -1,7 +1,7 @@
 // /endpoints/hello.js
 const meta = {
   name: 'Hello',               // Unique endpoint name
-  description: 'Returns a greeting message',
+  desc: 'Returns a greeting message',
   category: 'Example',        // Sidebar category
   params: ['name'],            // Query or body parameters
 };
