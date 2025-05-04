@@ -23,7 +23,7 @@ Iwato Rest API is a modern, interactive API documentation and testing interface 
 
 Explore a working demo:
 
-> [https://wataru-api.vercel.app](https://wataru-api.vercel.app)
+> [https://iwato-rest-api.vercel.app/](https://iwato-rest-api.vercel.app)
 
 ---
 
