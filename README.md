@@ -91,7 +91,7 @@ Each endpoint is a self-contained Node.js module in the `/endpoints` directory. 
 // /endpoints/hello.js
 const meta = {
   name: 'hello',               // Unique endpoint name
-  description: 'Returns a greeting message',
+  desc: 'Returns a greeting message',
   category: 'examples',        // Sidebar category
   params: ['name'],            // Query or body parameters
 };
