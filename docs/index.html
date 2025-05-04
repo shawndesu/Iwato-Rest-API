@@ -633,6 +633,25 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+
+        /* Premium Icon Styles */
+        .nav-link:hover .w-6 svg path {
+            filter: drop-shadow(0 0 3px rgba(139, 92, 246, 0.6));
+        }
+
+        .nav-link.bg-dark-700 .w-6 svg path {
+            filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.7));
+        }
+
+        @keyframes pulse-gradient {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        .nav-link.bg-dark-700 .w-6 svg {
+            animation: pulse-gradient 2s infinite;
+        }
     </style>
 </head>
 <body class="bg-dark-900 text-gray-200 min-h-screen transition-all duration-300">
@@ -653,7 +672,7 @@
             <div class="flex items-center space-x-3">
                 <div class="api-logo">
                     <svg viewBox="0 0 122.88 91.26" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.32,0h106.24c4.58,0,8.32,3.74,8.32,8.32v74.62c0,4.57-3.74,8.32-8.32,8.32H8.32C3.74,91.26,0,87.51,0,82.94 V8.32C0,3.74,3.74,0,8.32,0L8.32,0z M43.7,64.74H32.8l-1.57,5.14H21.4l11.73-31.16h10.54l11.68,31.16H45.26L43.7,64.74L43.7,64.74z M41.67,58l-3.4-11.2L34.85,58H41.67L41.67,58z M59.15,38.72h16.02c3.49,0,6.1,0.83,7.84,2.49c1.73,1.66,2.6,4.03,2.6,7.09 c0,3.15-0.95,5.61-2.84,7.38c-1.89,1.78-4.79,2.66-8.68,2.66h-5.28v11.53h-9.66V38.72L59.15,38.72z M68.81,52.03h2.37 c1.87,0,3.18-0.33,3.94-0.97c0.75-0.65,1.13-1.47,1.13-2.48c0-0.98-0.33-1.81-0.99-2.49c-0.65-0.68-1.89-1.02-3.7-1.02h-2.76V52.03 L68.81,52.03z M91.82,38.72h9.66v31.16h-9.66V38.72L91.82,38.72z M117.97,23.29H5.29v60.46c0,0.64,0.25,1.2,0.67,1.63 c0.42,0.42,0.99,0.67,1.63,0.67h108.04c0.64,0,1.2-0.25,1.63-0.67c0.43-0.43,0.67-0.99,0.67-1.63V23.29H117.97L117.97,23.29z M106.64,9.35c2.27,0,4.11,1.84,4.11,4.11c0,2.27-1.84,4.11-4.11,4.11c-2.27,0-4.11-1.84-4.11-4.11 C102.54,11.19,104.38,9.35,106.64,9.35L106.64,9.35z M78.8,9.35c2.27,0,4.11,1.84,4.11,4.11c0,2.27-1.84,4.11-4.11,4.11 c-2.27,0-4.11-1.84-4.11-4.11C74.69,11.19,76.53,9.35,78.8,9.35L78.8,9.35z M92.72,9.35c2.27,0,4.11,1.84,4.11,4.11 c0,2.27-1.84,4.11-4.11,4.11c-2.27,0-4.11-1.84-4.11-4.11C88.61,11.19,90.45,9.35,92.72,9.35L92.72,9.35z"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.32,0h106.24c4.58,0,8.32,3.74,8.32,8.32v74.62c0,4.57-3.74,8.32-8.32,8.32H8.32C3.74,91.26,0,87.51,0,82.94 V8.32C0,3.74,3.74,0,8.32,0L8.32,0z M43.7,64.74H32.8l-1.57,5.14H21.4l11.73-31.16h10.54l11.68,31.16H45.26L43.7,64.74L43.7,64.74z M41.67,58l-3.4-11.2L34.85,58H41.67L41.67,58z M59.15,38.72h16.02c3.49,0,6.1,0.83,7.84,2.49c1.73,1.66,2.6,4.03,2.6,7.09 c0,3.15-0.95,5.61-2.84,7.38c-1.89,1.78-4.79,2.66-8.68,2.66h-5.28v11.53h-9.66V38.72L59.15,38.72z M68.81,52.03h2.37 c1.87,0,3.18-0.33,3.94-0.97c0.75-0.65,1.13-1.47,1.13-2.48c0-0.98-0.33-1.81-0.99-2.49c-0.65-0.68-1.89-1.02-3.7-1.02h-2.76V52.03 L68.81,52.03z M91.82,38.72h9.66v31.16h-9.66V38.72L91.82,38.72z M117.97,23.29H5.29v60.46c0,0.64,0.25,1.2,0.67,1.63 c0.42,0.42,0.99,0.67,1.63,0.67h108.04c0.64,0,1.2-0.25,1.63-0.67c0.43-0.43,0.67-0.99,0.67-1.63V23.29H117.97L117.97,23.29z M106.64,9.35c2.27,0,4.11,1.84,4.11,4.11c0,2.27-1.84,4.11-4.11,4.11 c-2.27,0-4.11-1.84-4.11-4.11 C102.54,11.19,104.38,9.35,106.64,9.35L106.64,9.35z M78.8,9.35c2.27,0,4.11,1.84,4.11,4.11c0,2.27-1.84,4.11-4.11,4.11 c-2.27,0-4.11-1.84-4.11-4.11C74.69,11.19,76.53,9.35,78.8,9.35L78.8,9.35z M92.72,9.35c2.27,0,4.11,1.84,4.11,4.11 c0,2.27-1.84,4.11-4.11,4.11c-2.27,0-4.11-1.84-4.11-4.11C88.61,11.19,90.45,9.35,92.72,9.35L92.72,9.35z"/>
                     </svg>
                 </div>
                 <div>
@@ -664,17 +683,47 @@
         </div>
 
         <div class="py-5">
-            <nav>
-                <a href="#" class="nav-link flex items-center px-5 py-3 text-gray-200 hover:bg-dark-700 transition-colors duration-200" data-page="home">
-                    <span class="material-icons mr-3">home</span>
-                    <span>Home</span>
-                </a>
-                <a href="#" class="nav-link flex items-center px-5 py-3 text-gray-400 hover:bg-dark-700 hover:text-gray-200 transition-colors duration-200" data-page="stats">
-                    <span class="material-icons mr-3">analytics</span>
-                    <span>Stats</span>
-                </a>
-            </nav>
-        </div>
+    <nav>
+        <a href="#" class="nav-link flex items-center px-5 py-3 text-gray-200 hover:bg-dark-700 transition-colors duration-200 group" data-page="home">
+            <div class="w-6 h-6 mr-3 flex-shrink-0">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="homeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#8B5CF6" />
+                            <stop offset="50%" stop-color="#EC4899" />
+                            <stop offset="100%" stop-color="#6366F1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M10.5 19.5V14.5H13.5V19.5H18V12.5H20.5L12 4.5L3.5 12.5H6V19.5H10.5Z" fill="url(#homeGradient)" />
+                    <path d="M10.5 19.5V14.5H13.5V19.5H18V12.5H20.5L12 4.5L3.5 12.5H6V19.5H10.5Z" fill="url(#homeGradient)" class="opacity-80" />
+                    <path d="M10.5 19.5V14.5H13.5V19.5H18V12.5H20.5L12 4.5L3.5 12.5H6V19.5H10.5Z" stroke="white" stroke-width="0.5" stroke-opacity="0.3" />
+                </svg>
+            </div>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-link flex items-center px-5 py-3 text-gray-400 hover:bg-dark-700 hover:text-gray-200 transition-colors duration-200 group" data-page="stats">
+            <div class="w-6 h-6 mr-3 flex-shrink-0">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="statsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#8B5CF6" />
+                            <stop offset="50%" stop-color="#EC4899" />
+                            <stop offset="100%" stop-color="#6366F1" />
+                        </linearGradient>
+                        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="1" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                    </defs>
+                    <path d="M3 13.5H7V19.5H3V13.5ZM10 10.5H14V19.5H10V10.5ZM17 3.5H21V19.5H17V3.5Z" fill="url(#statsGradient)" />
+                    <path d="M3 13.5H7V19.5H3V13.5ZM10 10.5H14V19.5H10V10.5ZM17 3.5H21V19.5H17V3.5Z" fill="url(#statsGradient)" class="opacity-80" />
+                    <path d="M3 13.5H7V19.5H3V13.5ZM10 10.5H14V19.5H10V10.5ZM17 3.5H21V19.5H17V3.5Z" stroke="white" stroke-width="0.5" stroke-opacity="0.3" filter="url(#glow)" />
+                </svg>
+            </div>
+            <span>Stats</span>
+        </a>
+    </nav>
+</div>
 
         <div class="absolute bottom-0 left-0 right-0 p-5 border-t border-dark-600">
             <div class="gradient-border">
@@ -895,6 +944,5 @@
     </div>
 
     <script src="/script.js"></script>
-    
 </body>
 </html>
