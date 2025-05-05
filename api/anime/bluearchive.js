@@ -4,6 +4,7 @@ const axios = require('axios');
 const meta = {
     name: 'Blue Archive',
     desc: 'Blue archive random image',
+    method: 'get',
     category: 'Anime',
 };
 

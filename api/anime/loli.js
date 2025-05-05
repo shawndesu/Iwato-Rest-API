@@ -4,6 +4,7 @@ const axios = require('axios');
 const meta = {
     name: 'Loli',
     desc: 'Loli random image',
+    method: 'get',
     category: 'Anime',
 };
 
