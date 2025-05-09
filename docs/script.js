@@ -962,243 +962,6 @@ async function handleApiSubmit() {
   }
 }
 
-function setupSearchFunctionality(endpoints) {
-  const searchInput = document.getElementById("api-search")
-  const clearSearchBtn = document.getElementById("clear-search")
-  const searchResultsContainer = document.getElementById("search-results-container")
-  const searchResults = document.getElementById("search-results")
-  const noResults = document.getElementById("no-results")
-
-  if (!searchInput || !searchResultsContainer || !searchResults || !noResults || !clearSearchBtn) {
-    console.error("Search elements not found in the DOM")
-    return
-  }
-
-  let originalData = null
-
-  function captureOriginalData() {
-    const result = []
-    const accordionHeaders = document.querySelectorAll("#api-content .accordion-header")
-    const accordionContents = document.querySelectorAll("#api-content .accordion-content")
-
-    accordionHeaders.forEach((header, index) => {
-      const content = accordionContents[index]
-      if (content) {
-        const items = Array.from(content.querySelectorAll("div[data-name]")).map((item) => {
-          return {
-            element: item.cloneNode(true),
-            name: item.dataset.name,
-            desc: item.dataset.desc || "No description available",
-          }
-        })
-
-        result.push({
-          categoryElement: header,
-          contentElement: content,
-          items: items,
-        })
-      }
-    })
-
-    return result
-  }
-
-  function restoreOriginalData() {
-    if (!originalData) return
-
-    originalData.forEach((categoryData) => {
-      categoryData.categoryElement.classList.remove("hidden")
-      const content = categoryData.contentElement
-      const apiItems = content.querySelector(".api-items")
-      if (apiItems) {
-        apiItems.innerHTML = ""
-
-        categoryData.items.forEach((item) => {
-          const newItem = item.element.cloneNode(true)
-          apiItems.appendChild(newItem)
-        })
-      }
-    })
-  }
-
-  // Extract API data from endpoints for search
-  function extractApiData(endpoints) {
-    if (!endpoints || !endpoints.endpoints) return []
-
-    const apiData = []
-    endpoints.endpoints.forEach((category) => {
-      if (category.items) {
-        Object.entries(category.items).forEach(([key, itemData]) => {
-          const itemName = Object.keys(itemData)[0]
-          const item = itemData[itemName]
-          apiData.push({
-            id: key,
-            title: itemName,
-            path: item.path || "",
-            description: item.desc || "No description available",
-            category: category.name,
-          })
-        })
-      }
-    })
-
-    return apiData
-  }
-
-  // Highlight matching text
-  function highlightMatch(text, query) {
-    if (!text) return ""
-    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
-    return text.replace(regex, '<span class="search-highlight">$1</span>')
-  }
-
-  // Perform search
-  function performSearch(query) {
-    if (!query) {
-      searchResultsContainer.classList.add("hidden")
-      return
-    }
-
-    query = query.toLowerCase()
-
-    // Use the extracted API data or fall back to original data
-    const apiData = extractApiData(endpoints)
-
-    const results = apiData.filter(
-      (item) =>
-        (item.title && item.title.toLowerCase().includes(query)) ||
-        (item.path && item.path.toLowerCase().includes(query)) ||
-        (item.description && item.description.toLowerCase().includes(query)),
-    )
-
-    searchResults.innerHTML = ""
-
-    if (results.length === 0) {
-      searchResults.classList.add("hidden")
-      noResults.classList.remove("hidden")
-    } else {
-      searchResults.classList.remove("hidden")
-      noResults.classList.add("hidden")
-
-      results.forEach((result) => {
-        const resultItem = document.createElement("div")
-        resultItem.className = "search-result-item"
-
-        // Highlight the matching text
-        const titleWithHighlight = highlightMatch(result.title, query)
-        const pathWithHighlight = highlightMatch(result.path, query)
-
-        resultItem.innerHTML = `
-        <div class="result-title">${titleWithHighlight}</div>
-        <div class="result-path">${pathWithHighlight}</div>
-        <div class="text-xs text-gray-500 mt-1">Category: ${result.category}</div>
-      `
-
-        resultItem.addEventListener("click", () => {
-          // Navigate to API detail page
-          navigateToApiDetail(result.title, result.path, result.description)
-          searchResultsContainer.classList.add("hidden")
-        })
-
-        searchResults.appendChild(resultItem)
-      })
-    }
-
-    searchResultsContainer.classList.remove("hidden")
-  }
-
-  originalData = captureOriginalData()
-
-  // Event listeners
-  searchInput.addEventListener("input", function () {
-    const query = this.value.trim()
-
-    if (query === "") {
-      searchResultsContainer.classList.add("hidden")
-      restoreOriginalData()
-      return
-    }
-
-    performSearch(query)
-
-    // Filter accordion content based on search
-    if (originalData) {
-      originalData.forEach((categoryData) => {
-        let categoryVisible = false
-        const content = categoryData.contentElement
-        const apiItems = content.querySelector(".api-items")
-        apiItems.innerHTML = ""
-
-        categoryData.items.forEach((item) => {
-          if (
-            item.name.toLowerCase().includes(query.toLowerCase()) ||
-            item.desc.toLowerCase().includes(query.toLowerCase())
-          ) {
-            const newItem = item.element.cloneNode(true)
-            apiItems.appendChild(newItem)
-            categoryVisible = true
-          }
-        })
-
-        if (!categoryVisible) {
-          categoryData.categoryElement.classList.add("hidden")
-          content.classList.remove("active")
-        } else {
-          categoryData.categoryElement.classList.remove("hidden")
-          categoryData.categoryElement.classList.add("active")
-          content.classList.add("active")
-        }
-      })
-    }
-  })
-
-  clearSearchBtn.addEventListener("click", () => {
-    searchInput.value = ""
-    searchResultsContainer.classList.add("hidden")
-    searchInput.focus()
-    restoreOriginalData()
-  })
-
-  // Close search results when clicking outside
-  document.addEventListener("click", (event) => {
-    if (!searchResultsContainer.contains(event.target) && event.target !== searchInput) {
-      searchResultsContainer.classList.add("hidden")
-    }
-  })
-
-  // Focus search with keyboard shortcut (Ctrl+K or Command+K)
-  document.addEventListener("keydown", (event) => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "k") {
-      event.preventDefault()
-      searchInput.focus()
-    }
-
-    // Close search results with Escape key
-    if (event.key === "Escape" && !searchResultsContainer.classList.contains("hidden")) {
-      searchResultsContainer.classList.add("hidden")
-      searchInput.blur()
-    }
-  })
-
-  // Add styles for the global search page
-  const style = document.createElement("style")
-  style.textContent = `
-    .search-highlight {
-      color: #6366F1;
-      font-weight: 500;
-    }
-
-    #global-search-results .search-result-item {
-      cursor: pointer;
-    }
-
-    #global-search-results .search-result-item:hover {
-      background-color: rgba(42, 42, 54, 0.7);
-    }
-  `
-  document.head.appendChild(style)
-}
-
 function setupGlobalSearch(endpoints) {
   const searchInput = document.getElementById("global-search")
   const clearSearchBtn = document.getElementById("global-clear-search")
@@ -1550,23 +1313,260 @@ function createDownloadButton(url, filename) {
 
 // Function to add syntax highlighting to JSON
 function syntaxHighlight(json) {
-  json = json.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">")
+  json = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
   return json.replace(
     /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
     (match) => {
-      let cls = "text-amber-400" // number
+      let cls = "json-number" // number
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
-          cls = "text-blue-400" // key
+          cls = "json-key" // key
         } else {
-          cls = "text-green-400" // string
+          cls = "json-string" // string
         }
       } else if (/true|false/.test(match)) {
-        cls = "text-accent-purple" // boolean
+        cls = "json-boolean" // boolean
       } else if (/null/.test(match)) {
-        cls = "text-accent-pink" // null
+        cls = "json-null" // null
       }
-      return '<span class="' + cls + '">' + match + "</span>"
+      return '<span class="' + cls + '">' + match + '</span>'
     },
   )
+}
+
+function setupSearchFunctionality(endpoints) {
+  const searchInput = document.getElementById("api-search")
+  const clearSearchBtn = document.getElementById("clear-search")
+  const searchResultsContainer = document.getElementById("search-results-container")
+  const searchResults = document.getElementById("search-results")
+  const noResults = document.getElementById("no-results")
+
+  if (!searchInput || !searchResultsContainer || !searchResults || !noResults || !clearSearchBtn) {
+    console.error("Search elements not found in the DOM")
+    return
+  }
+
+  let originalData = null
+
+  function captureOriginalData() {
+    const result = []
+    const accordionHeaders = document.querySelectorAll("#api-content .accordion-header")
+    const accordionContents = document.querySelectorAll("#api-content .accordion-content")
+
+    accordionHeaders.forEach((header, index) => {
+      const content = accordionContents[index]
+      if (content) {
+        const items = Array.from(content.querySelectorAll("div[data-name]")).map((item) => {
+          return {
+            element: item.cloneNode(true),
+            name: item.dataset.name,
+            desc: item.dataset.desc || "No description available",
+          }
+        })
+
+        result.push({
+          categoryElement: header,
+          contentElement: content,
+          items: items,
+        })
+      }
+    })
+
+    return result
+  }
+
+  function restoreOriginalData() {
+    if (!originalData) return
+
+    originalData.forEach((categoryData) => {
+      categoryData.categoryElement.classList.remove("hidden")
+      const content = categoryData.contentElement
+      const apiItems = content.querySelector(".api-items")
+      if (apiItems) {
+        apiItems.innerHTML = ""
+
+        categoryData.items.forEach((item) => {
+          const newItem = item.element.cloneNode(true)
+          apiItems.appendChild(newItem)
+        })
+      }
+    })
+  }
+
+  // Extract API data from endpoints for search
+  function extractApiData(endpoints) {
+    if (!endpoints || !endpoints.endpoints) return []
+
+    const apiData = []
+    endpoints.endpoints.forEach((category) => {
+      if (category.items) {
+        Object.entries(category.items).forEach(([key, itemData]) => {
+          const itemName = Object.keys(itemData)[0]
+          const item = itemData[itemName]
+          apiData.push({
+            id: key,
+            title: itemName,
+            path: item.path || "",
+            description: item.desc || "No description available",
+            category: category.name,
+          })
+        })
+      }
+    })
+
+    return apiData
+  }
+
+  // Highlight matching text
+  function highlightMatch(text, query) {
+    if (!text) return ""
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
+    return text.replace(regex, '<span class="search-highlight">$1</span>')
+  }
+
+  // Perform search
+  function performSearch(query) {
+    if (!query) {
+      searchResultsContainer.classList.add("hidden")
+      return
+    }
+
+    query = query.toLowerCase()
+
+    // Use the extracted API data or fall back to original data
+    const apiData = extractApiData(endpoints)
+
+    const results = apiData.filter(
+      (item) =>
+        (item.title && item.title.toLowerCase().includes(query)) ||
+        (item.path && item.path.toLowerCase().includes(query)) ||
+        (item.description && item.description.toLowerCase().includes(query)),
+    )
+
+    searchResults.innerHTML = ""
+
+    if (results.length === 0) {
+      searchResults.classList.add("hidden")
+      noResults.classList.remove("hidden")
+    } else {
+      searchResults.classList.remove("hidden")
+      noResults.classList.add("hidden")
+
+      results.forEach((result) => {
+        const resultItem = document.createElement("div")
+        resultItem.className = "search-result-item"
+
+        // Highlight the matching text
+        const titleWithHighlight = highlightMatch(result.title, query)
+        const pathWithHighlight = highlightMatch(result.path, query)
+
+        resultItem.innerHTML = `
+        <div class="result-title">${titleWithHighlight}</div>
+        <div class="result-path">${pathWithHighlight}</div>
+        <div class="text-xs text-gray-500 mt-1">Category: ${result.category}</div>
+      `
+
+        resultItem.addEventListener("click", () => {
+          // Navigate to API detail page
+          navigateToApiDetail(result.title, result.path, result.description)
+          searchResultsContainer.classList.add("hidden")
+        })
+
+        searchResults.appendChild(resultItem)
+      })
+    }
+
+    searchResultsContainer.classList.remove("hidden")
+  }
+
+  originalData = captureOriginalData()
+
+  // Event listeners
+  searchInput.addEventListener("input", function () {
+    const query = this.value.trim()
+
+    if (query === "") {
+      searchResultsContainer.classList.add("hidden")
+      restoreOriginalData()
+      return
+    }
+
+    performSearch(query)
+
+    // Filter accordion content based on search
+    if (originalData) {
+      originalData.forEach((categoryData) => {
+        let categoryVisible = false
+        const content = categoryData.contentElement
+        const apiItems = content.querySelector(".api-items")
+        apiItems.innerHTML = ""
+
+        categoryData.items.forEach((item) => {
+          if (
+            item.name.toLowerCase().includes(query.toLowerCase()) ||
+            item.desc.toLowerCase().includes(query.toLowerCase())
+          ) {
+            const newItem = item.element.cloneNode(true)
+            apiItems.appendChild(newItem)
+            categoryVisible = true
+          }
+        })
+
+        if (!categoryVisible) {
+          categoryData.categoryElement.classList.add("hidden")
+          content.classList.remove("active")
+        } else {
+          categoryData.categoryElement.classList.remove("hidden")
+          categoryData.categoryElement.classList.add("active")
+          content.classList.add("active")
+        }
+      })
+    }
+  })
+
+  clearSearchBtn.addEventListener("click", () => {
+    searchInput.value = ""
+    searchResultsContainer.classList.add("hidden")
+    searchInput.focus()
+    restoreOriginalData()
+  })
+
+  // Close search results when clicking outside
+  document.addEventListener("click", (event) => {
+    if (!searchResultsContainer.contains(event.target) && event.target !== searchInput) {
+      searchResultsContainer.classList.add("hidden")
+    }
+  })
+
+  // Focus search with keyboard shortcut (Ctrl+K or Command+K)
+  document.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "k") {
+      event.preventDefault()
+      searchInput.focus()
+    }
+
+    // Close search results with Escape key
+    if (event.key === "Escape" && !searchResultsContainer.classList.contains("hidden")) {
+      searchResultsContainer.classList.add("hidden")
+      searchInput.blur()
+    }
+  })
+
+  // Add styles for the global search page
+  const style = document.createElement("style")
+  style.textContent = `
+    .search-highlight {
+      color: #6366F1;
+      font-weight: 500;
+    }
+
+    #global-search-results .search-result-item {
+      cursor: pointer;
+    }
+
+    #global-search-results .search-result-item:hover {
+      background-color: rgba(42, 42, 54, 0.7);
+    }
+  `
+  document.head.appendChild(style)
 }

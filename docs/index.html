@@ -885,6 +885,52 @@
           padding: 0.35rem 0.75rem !important; /* Smaller button */
           font-size: 0.75rem !important; /* Smaller text */
       }
+
+      /* Fix for API response container to prevent horizontal scrolling */
+      #detail-response-wrapper {
+          position: relative;
+          width: 100%;
+          overflow: hidden;
+      }
+
+      #detail-response-data {
+          max-width: 100%;
+          overflow-x: auto;
+          word-wrap: break-word;
+          white-space: pre-wrap;
+      }
+
+      #detail-response-data pre {
+          white-space: pre-wrap;
+          word-break: break-word;
+      }
+
+      #detail-response-data .whitespace-pre-wrap {
+          white-space: pre-wrap !important;
+          word-break: break-word !important;
+          overflow-wrap: break-word !important;
+      }
+
+      /* Improved JSON formatting */
+      .json-key {
+          color: #6366F1;
+      }
+
+      .json-string {
+          color: #10B981;
+      }
+
+      .json-number {
+          color: #F59E0B;
+      }
+
+      .json-boolean {
+          color: #8B5CF6;
+      }
+
+      .json-null {
+          color: #EC4899;
+      }
   </style>
 </head>
 <body class="bg-dark-900 text-gray-200 min-h-screen transition-all duration-300">
@@ -1222,6 +1268,7 @@
   <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
     <div class="relative max-w-full max-h-full">
       <img id="modal-image" src="/placeholder.svg" alt="Full size image" class="max-w-full max-h-full">
+      <button id="close-modal" class="absolute top-4 right-4 text-  class="max-w-full max-h-full">
       <button id="close-modal" class="absolute top-4 right-4 text-white text-2xl">&times;</button>
     </div>
   </div>
