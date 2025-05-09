@@ -163,6 +163,19 @@ function setupNavigation() {
       // Save active page to localStorage
       localStorage.setItem("activePage", pageToShow);
 
+      // If we're on the API detail page, save the API details
+      if (pageToShow === "api-detail") {
+        const apiTitle = document.getElementById("detail-api-title").textContent;
+        const apiDesc = document.getElementById("detail-api-description").textContent;
+        const apiMethod = document.getElementById("detail-api-method").textContent;
+        const apiEndpoint = document.getElementById("detail-endpoint-url").textContent;
+
+        localStorage.setItem("api-detail-title", apiTitle);
+        localStorage.setItem("api-detail-desc", apiDesc);
+        localStorage.setItem("api-detail-method", apiMethod);
+        localStorage.setItem("api-detail-endpoint", apiEndpoint);
+      }
+
       // Close sidebar on mobile after navigation
       if (window.innerWidth < 768) {
         closeSidebar();
@@ -177,6 +190,27 @@ function restoreActivePage() {
 
   if (activeLink) {
     activeLink.click();
+  }
+
+  // If we were on the API detail page, restore the API details
+  if (activePage === "api-detail") {
+    const apiTitle = localStorage.getItem("api-detail-title");
+    const apiDesc = localStorage.getItem("api-detail-desc");
+    const apiMethod = localStorage.getItem("api-detail-method");
+    const apiEndpoint = localStorage.getItem("api-detail-endpoint");
+
+    if (apiTitle && apiDesc && apiMethod && apiEndpoint) {
+      document.getElementById("detail-api-title").textContent = apiTitle;
+      document.getElementById("detail-api-description").textContent = apiDesc;
+      document.getElementById("detail-api-method").textContent = apiMethod;
+      document.getElementById("detail-endpoint-url").textContent = apiEndpoint;
+
+      // Show the API detail page
+      document.querySelectorAll(".page-content").forEach((page) => {
+        page.classList.add("hidden");
+      });
+      document.getElementById("api-detail-page").classList.remove("hidden");
+    }
   }
 }
 
@@ -199,7 +233,7 @@ function updateStats(endpoints) {
       categoryItem.innerHTML = `
         <div class="flex items-center">
           <div class="category-icon">
-            <span class="material-icons text-accent-primary">folder</span>
+            <span class="material-icons text-white">folder</span>
           </div>
           <span class="text-white font-medium">${category.name}</span>
         </div>
@@ -482,8 +516,8 @@ function setupAllApisPage(endpoints) {
     const categoryHeader = document.createElement("h3");
     categoryHeader.className = "mb-4 text-xl font-bold text-white flex items-center";
     categoryHeader.innerHTML = `
-      <div class="w-8 h-8 mr-3 flex items-center justify-center bg-accent-primary bg-opacity-20 rounded-lg">
-        <span class="material-icons text-accent-primary">folder</span>
+      <div class="w-8 h-8 mr-3 flex items-center justify-center bg-gradient-to-br from-accent-primary via-accent-purple to-accent-pink rounded-lg">
+        <span class="material-icons text-white">folder</span>
       </div>
       ${category.name}
     `;
@@ -658,6 +692,13 @@ function navigateToApiDetail(name, endpoint, description, method = "GET") {
   // Set endpoint URL
   const url = new URL(endpoint, window.location.origin);
   document.getElementById("detail-endpoint-url").textContent = url.href;
+
+  // Save API details to localStorage for persistence
+  localStorage.setItem("activePage", "api-detail");
+  localStorage.setItem("api-detail-title", name);
+  localStorage.setItem("api-detail-desc", description);
+  localStorage.setItem("api-detail-method", method);
+  localStorage.setItem("api-detail-endpoint", url.href);
 
   // Reset response container
   const responseContainer = document.getElementById("detail-response-container");
