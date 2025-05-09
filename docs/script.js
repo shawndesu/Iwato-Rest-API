@@ -159,22 +159,6 @@ function setupNavigation() {
       // Show the selected page
       document.getElementById(`${pageToShow}-page`).classList.remove("hidden")
 
-      // Save active page to localStorage
-      localStorage.setItem("activePage", pageToShow)
-
-      // If we're on the API detail page, save the API details
-      if (pageToShow === "api-detail") {
-        const apiTitle = document.getElementById("detail-api-title").textContent
-        const apiDesc = document.getElementById("detail-api-description").textContent
-        const apiMethod = document.getElementById("detail-api-method").textContent
-        const apiEndpoint = document.getElementById("detail-endpoint-url").textContent
-
-        localStorage.setItem("api-detail-title", apiTitle)
-        localStorage.setItem("api-detail-desc", apiDesc)
-        localStorage.setItem("api-detail-method", apiMethod)
-        localStorage.setItem("api-detail-endpoint", apiEndpoint)
-      }
-
       // Close sidebar on mobile after navigation
       if (window.innerWidth < 768) {
         closeSidebar()
@@ -184,32 +168,10 @@ function setupNavigation() {
 }
 
 function restoreActivePage() {
-  const activePage = localStorage.getItem("activePage") || "home"
-  const activeLink = document.querySelector(`.nav-link[data-page="${activePage}"]`)
-
+  // Default to home page
+  const activeLink = document.querySelector(`.nav-link[data-page="home"]`)
   if (activeLink) {
     activeLink.click()
-  }
-
-  // If we were on the API detail page, restore the API details
-  if (activePage === "api-detail") {
-    const apiTitle = localStorage.getItem("api-detail-title")
-    const apiDesc = localStorage.getItem("api-detail-desc")
-    const apiMethod = localStorage.getItem("api-detail-method")
-    const apiEndpoint = localStorage.getItem("api-detail-endpoint")
-
-    if (apiTitle && apiDesc && apiMethod && apiEndpoint) {
-      document.getElementById("detail-api-title").textContent = apiTitle
-      document.getElementById("detail-api-description").textContent = apiDesc
-      document.getElementById("detail-api-method").textContent = apiMethod
-      document.getElementById("detail-endpoint-url").textContent = apiEndpoint
-
-      // Show the API detail page
-      document.querySelectorAll(".page-content").forEach((page) => {
-        page.classList.add("hidden")
-      })
-      document.getElementById("api-detail-page").classList.remove("hidden")
-    }
   }
 }
 
@@ -360,6 +322,24 @@ function setupNotifications(notifications) {
 
   if (!notificationDropdown || !notificationList || !notificationBadge || !markAllReadBtn) return
 
+  // Load read states from localStorage
+  let readStates = {}
+  try {
+    const savedStates = localStorage.getItem("notification-read-states")
+    if (savedStates) {
+      readStates = JSON.parse(savedStates)
+    }
+  } catch (error) {
+    console.error("Error loading notification states:", error)
+  }
+
+  // Apply read states to notifications
+  notifications.forEach((notification) => {
+    if (readStates[notification.id]) {
+      notification.read = true
+    }
+  })
+
   // Update notification badge
   const unreadCount = notifications.filter((n) => !n.read).length
   notificationBadge.textContent = unreadCount
@@ -412,6 +392,10 @@ function setupNotifications(notifications) {
         notificationBadge.textContent = unreadItems
         notificationBadge.style.display = unreadItems > 0 ? "flex" : "none"
 
+        // Save to localStorage
+        readStates[notification.id] = true
+        localStorage.setItem("notification-read-states", JSON.stringify(readStates))
+
         showToast("Notification marked as read", "success")
       }
     })
@@ -424,6 +408,7 @@ function setupNotifications(notifications) {
     button.addEventListener("click", function (e) {
       e.stopPropagation() // Prevent triggering the parent click event
       const notificationItem = this.closest(".notification-item")
+      const notificationId = notificationItem.dataset.id
       notificationItem.classList.remove("unread")
       this.remove()
 
@@ -431,6 +416,10 @@ function setupNotifications(notifications) {
       const unreadItems = document.querySelectorAll(".notification-item.unread").length
       notificationBadge.textContent = unreadItems
       notificationBadge.style.display = unreadItems > 0 ? "flex" : "none"
+
+      // Save to localStorage
+      readStates[notificationId] = true
+      localStorage.setItem("notification-read-states", JSON.stringify(readStates))
 
       showToast("Notification marked as read", "success")
     })
@@ -441,12 +430,17 @@ function setupNotifications(notifications) {
     e.stopPropagation() // Prevent event bubbling
 
     document.querySelectorAll(".notification-item").forEach((item) => {
+      const notificationId = item.dataset.id
       item.classList.remove("unread")
+      readStates[notificationId] = true
     })
 
     document.querySelectorAll(".mark-read").forEach((button) => {
       button.remove()
     })
+
+    // Save all as read to localStorage
+    localStorage.setItem("notification-read-states", JSON.stringify(readStates))
 
     notificationBadge.style.display = "none"
     showToast("All notifications marked as read", "success")
@@ -654,10 +648,6 @@ function setupApiDetailPage() {
 }
 
 function navigateToApiDetail(name, endpoint, description, method = "GET") {
-  // Save current page to return to later
-  const currentPage = document.querySelector(".page-content:not(.hidden)").id.replace("-page", "")
-  localStorage.setItem("previousPage", currentPage)
-
   // Hide all pages
   document.querySelectorAll(".page-content").forEach((page) => {
     page.classList.add("hidden")
@@ -678,13 +668,6 @@ function navigateToApiDetail(name, endpoint, description, method = "GET") {
   // Set endpoint URL
   const url = new URL(endpoint, window.location.origin)
   document.getElementById("detail-endpoint-url").textContent = url.href
-
-  // Save API details to localStorage for persistence
-  localStorage.setItem("activePage", "api-detail")
-  localStorage.setItem("api-detail-title", name)
-  localStorage.setItem("api-detail-desc", description)
-  localStorage.setItem("api-detail-method", method)
-  localStorage.setItem("api-detail-endpoint", url.href)
 
   // Reset response container
   const responseContainer = document.getElementById("detail-response-container")
@@ -1329,7 +1312,7 @@ function syntaxHighlight(json) {
       } else if (/null/.test(match)) {
         cls = "json-null" // null
       }
-      return '<span class="' + cls + '">' + match + '</span>'
+      return '<span class="' + cls + '">' + match + "</span>"
     },
   )
 }
