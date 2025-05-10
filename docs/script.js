@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setContent("api-name", "textContent", set.name)
     setContent("api-author", "textContent", `by ${set.author}`)
     setContent("api-desc", "textContent", set.description)
+    setContent("api-links", "innerHTML", set.links ? set.links.map(link => `<a href="${link.url}" class="hover:text-white transition-colors">${link.name}</a>`).join('') : '')
 
     // Setup components
     setupApiContent(endpoints)
@@ -32,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupApiDetailPage()
 
     // Restore active page from localStorage
-    restoreActivePage()
+    restorePageState()
   } catch (error) {
     console.error("Error loading configuration:", error)
     showToast("Error loading configuration", "error")
@@ -67,6 +68,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.currentTarget.classList.add("hidden")
     }
   })
+
+  // Save page state when navigating away
+  window.addEventListener("beforeunload", savePageState)
 })
 
 // Initialize ripple effect for buttons
@@ -159,6 +163,9 @@ function setupNavigation() {
       // Show the selected page
       document.getElementById(`${pageToShow}-page`).classList.remove("hidden")
 
+      // Save current page to localStorage
+      localStorage.setItem("currentPage", pageToShow)
+
       // Close sidebar on mobile after navigation
       if (window.innerWidth < 768) {
         closeSidebar()
@@ -167,11 +174,67 @@ function setupNavigation() {
   })
 }
 
-function restoreActivePage() {
-  // Default to home page
-  const activeLink = document.querySelector(`.nav-link[data-page="home"]`)
+// Save current page state
+function savePageState() {
+  // Save current page
+  const activePage = document.querySelector(".page-content:not(.hidden)")
+  if (activePage) {
+    const pageId = activePage.id.replace("-page", "")
+    localStorage.setItem("currentPage", pageId)
+  }
+
+  // Save API detail state if on API detail page
+  if (!document.getElementById("api-detail-page").classList.contains("hidden")) {
+    const apiTitle = document.getElementById("detail-api-title").textContent
+    const apiEndpoint = document.getElementById("detail-endpoint-url").textContent
+    const apiDesc = document.getElementById("detail-api-description").textContent
+    const apiMethod = document.getElementById("detail-api-method").textContent
+
+    localStorage.setItem("apiDetailState", JSON.stringify({
+      title: apiTitle,
+      endpoint: apiEndpoint,
+      description: apiDesc,
+      method: apiMethod
+    }))
+  } else {
+    localStorage.removeItem("apiDetailState")
+  }
+
+  // Save scroll position
+  localStorage.setItem("scrollPosition", window.scrollY)
+}
+
+// Restore page state from localStorage
+function restorePageState() {
+  // Restore current page
+  const currentPage = localStorage.getItem("currentPage") || "home"
+  const activeLink = document.querySelector(`.nav-link[data-page="${currentPage}"]`)
+
   if (activeLink) {
     activeLink.click()
+  } else {
+    // Default to home page if saved page not found
+    const homeLink = document.querySelector(`.nav-link[data-page="home"]`)
+    if (homeLink) {
+      homeLink.click()
+    }
+  }
+
+  // Restore API detail page if needed
+  const apiDetailState = localStorage.getItem("apiDetailState")
+  if (apiDetailState && currentPage === "api-detail") {
+    try {
+      const { title, endpoint, description, method } = JSON.parse(apiDetailState)
+      navigateToApiDetail(title, endpoint, description, method)
+    } catch (error) {
+      console.error("Error restoring API detail state:", error)
+    }
+  }
+
+  // Restore scroll position
+  const scrollPosition = localStorage.getItem("scrollPosition")
+  if (scrollPosition) {
+    window.scrollTo(0, parseInt(scrollPosition, 10))
   }
 }
 
@@ -603,6 +666,9 @@ function setupApiButtonHandlers(endpoints) {
         .find((item) => item.path === apiPath && item.name === apiName)
 
       navigateToApiDetail(apiName, apiPath, apiDesc || "No description available")
+
+      // Save current page state
+      localStorage.setItem("currentPage", "api-detail")
     }
   })
 }
@@ -619,6 +685,10 @@ function setupApiDetailPage() {
 
     // Update page title
     document.getElementById("page-title").textContent = previousPage.charAt(0).toUpperCase() + previousPage.slice(1)
+
+    // Update localStorage
+    localStorage.setItem("currentPage", previousPage)
+    localStorage.removeItem("apiDetailState")
   })
 
   // Set up copy endpoint button
@@ -648,6 +718,13 @@ function setupApiDetailPage() {
 }
 
 function navigateToApiDetail(name, endpoint, description, method = "GET") {
+  // Store previous page for back button
+  const activePage = document.querySelector(".page-content:not(.hidden)")
+  if (activePage) {
+    const pageId = activePage.id.replace("-page", "")
+    localStorage.setItem("previousPage", pageId)
+  }
+
   // Hide all pages
   document.querySelectorAll(".page-content").forEach((page) => {
     page.classList.add("hidden")
@@ -677,6 +754,16 @@ function navigateToApiDetail(name, endpoint, description, method = "GET") {
 
   // Set up parameters
   setupApiParameters(endpoint)
+
+  // Save API detail state
+  const apiDetailState = {
+    title: name,
+    endpoint: url.href,
+    description: description,
+    method: method
+  }
+  localStorage.setItem("apiDetailState", JSON.stringify(apiDetailState))
+  localStorage.setItem("currentPage", "api-detail")
 }
 
 function setupApiParameters(endpoint) {
@@ -1104,6 +1191,9 @@ function setupGlobalSearch(endpoints) {
             if (result.type === "endpoint") {
               // Navigate to API detail page
               navigateToApiDetail(result.title, result.path, result.description)
+
+              // Save search query in localStorage
+              localStorage.setItem("lastSearchQuery", query)
             } else if (result.type === "category") {
               // Navigate to home page and open the category accordion
               const navLink = document.querySelector(`.nav-link[data-page="home"]`)
@@ -1140,6 +1230,9 @@ function setupGlobalSearch(endpoints) {
     } else {
       clearSearchBtn.classList.remove("opacity-0", "pointer-events-none")
       performSearch(query)
+
+      // Save search query to localStorage
+      localStorage.setItem("currentSearchQuery", query)
     }
   })
 
@@ -1148,7 +1241,18 @@ function setupGlobalSearch(endpoints) {
     clearSearchBtn.classList.add("opacity-0", "pointer-events-none")
     performSearch("")
     searchInput.focus()
+
+    // Clear search query from localStorage
+    localStorage.removeItem("currentSearchQuery")
   })
+
+  // Restore search query if available
+  const savedSearchQuery = localStorage.getItem("currentSearchQuery")
+  if (savedSearchQuery && document.getElementById("search-page") && !document.getElementById("search-page").classList.contains("hidden")) {
+    searchInput.value = savedSearchQuery
+    clearSearchBtn.classList.remove("opacity-0", "pointer-events-none")
+    performSearch(savedSearchQuery)
+  }
 
   // Focus search with keyboard shortcut (Ctrl+K or Command+K)
   document.addEventListener("keydown", (event) => {
@@ -1225,6 +1329,13 @@ function handleResize() {
     if (!sidebar.classList.contains("open")) {
       sidebarOverlay.classList.remove("active")
     }
+
+    // Optimize sidebar footer for mobile
+    const sidebarFooter = document.querySelector("#sidebar .sidebar-footer")
+    if (sidebarFooter) {
+      sidebarFooter.style.position = "relative"
+      sidebarFooter.style.bottom = "auto"
+    }
   } else {
     // Desktop layout
     sidebar.classList.remove("open")
@@ -1234,6 +1345,13 @@ function handleResize() {
     if (!sidebar.classList.contains("-translate-x-full")) {
       mainContent.classList.remove("ml-0")
       mainContent.classList.add("ml-64")
+    }
+
+    // Reset sidebar footer for desktop
+    const sidebarFooter = document.querySelector("#sidebar .sidebar-footer")
+    if (sidebarFooter) {
+      sidebarFooter.style.position = "absolute"
+      sidebarFooter.style.bottom = "0"
     }
   }
 
@@ -1315,241 +1433,4 @@ function syntaxHighlight(json) {
       return '<span class="' + cls + '">' + match + "</span>"
     },
   )
-}
-
-function setupSearchFunctionality(endpoints) {
-  const searchInput = document.getElementById("api-search")
-  const clearSearchBtn = document.getElementById("clear-search")
-  const searchResultsContainer = document.getElementById("search-results-container")
-  const searchResults = document.getElementById("search-results")
-  const noResults = document.getElementById("no-results")
-
-  if (!searchInput || !searchResultsContainer || !searchResults || !noResults || !clearSearchBtn) {
-    console.error("Search elements not found in the DOM")
-    return
-  }
-
-  let originalData = null
-
-  function captureOriginalData() {
-    const result = []
-    const accordionHeaders = document.querySelectorAll("#api-content .accordion-header")
-    const accordionContents = document.querySelectorAll("#api-content .accordion-content")
-
-    accordionHeaders.forEach((header, index) => {
-      const content = accordionContents[index]
-      if (content) {
-        const items = Array.from(content.querySelectorAll("div[data-name]")).map((item) => {
-          return {
-            element: item.cloneNode(true),
-            name: item.dataset.name,
-            desc: item.dataset.desc || "No description available",
-          }
-        })
-
-        result.push({
-          categoryElement: header,
-          contentElement: content,
-          items: items,
-        })
-      }
-    })
-
-    return result
-  }
-
-  function restoreOriginalData() {
-    if (!originalData) return
-
-    originalData.forEach((categoryData) => {
-      categoryData.categoryElement.classList.remove("hidden")
-      const content = categoryData.contentElement
-      const apiItems = content.querySelector(".api-items")
-      if (apiItems) {
-        apiItems.innerHTML = ""
-
-        categoryData.items.forEach((item) => {
-          const newItem = item.element.cloneNode(true)
-          apiItems.appendChild(newItem)
-        })
-      }
-    })
-  }
-
-  // Extract API data from endpoints for search
-  function extractApiData(endpoints) {
-    if (!endpoints || !endpoints.endpoints) return []
-
-    const apiData = []
-    endpoints.endpoints.forEach((category) => {
-      if (category.items) {
-        Object.entries(category.items).forEach(([key, itemData]) => {
-          const itemName = Object.keys(itemData)[0]
-          const item = itemData[itemName]
-          apiData.push({
-            id: key,
-            title: itemName,
-            path: item.path || "",
-            description: item.desc || "No description available",
-            category: category.name,
-          })
-        })
-      }
-    })
-
-    return apiData
-  }
-
-  // Highlight matching text
-  function highlightMatch(text, query) {
-    if (!text) return ""
-    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
-    return text.replace(regex, '<span class="search-highlight">$1</span>')
-  }
-
-  // Perform search
-  function performSearch(query) {
-    if (!query) {
-      searchResultsContainer.classList.add("hidden")
-      return
-    }
-
-    query = query.toLowerCase()
-
-    // Use the extracted API data or fall back to original data
-    const apiData = extractApiData(endpoints)
-
-    const results = apiData.filter(
-      (item) =>
-        (item.title && item.title.toLowerCase().includes(query)) ||
-        (item.path && item.path.toLowerCase().includes(query)) ||
-        (item.description && item.description.toLowerCase().includes(query)),
-    )
-
-    searchResults.innerHTML = ""
-
-    if (results.length === 0) {
-      searchResults.classList.add("hidden")
-      noResults.classList.remove("hidden")
-    } else {
-      searchResults.classList.remove("hidden")
-      noResults.classList.add("hidden")
-
-      results.forEach((result) => {
-        const resultItem = document.createElement("div")
-        resultItem.className = "search-result-item"
-
-        // Highlight the matching text
-        const titleWithHighlight = highlightMatch(result.title, query)
-        const pathWithHighlight = highlightMatch(result.path, query)
-
-        resultItem.innerHTML = `
-        <div class="result-title">${titleWithHighlight}</div>
-        <div class="result-path">${pathWithHighlight}</div>
-        <div class="text-xs text-gray-500 mt-1">Category: ${result.category}</div>
-      `
-
-        resultItem.addEventListener("click", () => {
-          // Navigate to API detail page
-          navigateToApiDetail(result.title, result.path, result.description)
-          searchResultsContainer.classList.add("hidden")
-        })
-
-        searchResults.appendChild(resultItem)
-      })
-    }
-
-    searchResultsContainer.classList.remove("hidden")
-  }
-
-  originalData = captureOriginalData()
-
-  // Event listeners
-  searchInput.addEventListener("input", function () {
-    const query = this.value.trim()
-
-    if (query === "") {
-      searchResultsContainer.classList.add("hidden")
-      restoreOriginalData()
-      return
-    }
-
-    performSearch(query)
-
-    // Filter accordion content based on search
-    if (originalData) {
-      originalData.forEach((categoryData) => {
-        let categoryVisible = false
-        const content = categoryData.contentElement
-        const apiItems = content.querySelector(".api-items")
-        apiItems.innerHTML = ""
-
-        categoryData.items.forEach((item) => {
-          if (
-            item.name.toLowerCase().includes(query.toLowerCase()) ||
-            item.desc.toLowerCase().includes(query.toLowerCase())
-          ) {
-            const newItem = item.element.cloneNode(true)
-            apiItems.appendChild(newItem)
-            categoryVisible = true
-          }
-        })
-
-        if (!categoryVisible) {
-          categoryData.categoryElement.classList.add("hidden")
-          content.classList.remove("active")
-        } else {
-          categoryData.categoryElement.classList.remove("hidden")
-          categoryData.categoryElement.classList.add("active")
-          content.classList.add("active")
-        }
-      })
-    }
-  })
-
-  clearSearchBtn.addEventListener("click", () => {
-    searchInput.value = ""
-    searchResultsContainer.classList.add("hidden")
-    searchInput.focus()
-    restoreOriginalData()
-  })
-
-  // Close search results when clicking outside
-  document.addEventListener("click", (event) => {
-    if (!searchResultsContainer.contains(event.target) && event.target !== searchInput) {
-      searchResultsContainer.classList.add("hidden")
-    }
-  })
-
-  // Focus search with keyboard shortcut (Ctrl+K or Command+K)
-  document.addEventListener("keydown", (event) => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "k") {
-      event.preventDefault()
-      searchInput.focus()
-    }
-
-    // Close search results with Escape key
-    if (event.key === "Escape" && !searchResultsContainer.classList.contains("hidden")) {
-      searchResultsContainer.classList.add("hidden")
-      searchInput.blur()
-    }
-  })
-
-  // Add styles for the global search page
-  const style = document.createElement("style")
-  style.textContent = `
-    .search-highlight {
-      color: #6366F1;
-      font-weight: 500;
-    }
-
-    #global-search-results .search-result-item {
-      cursor: pointer;
-    }
-
-    #global-search-results .search-result-item:hover {
-      background-color: rgba(42, 42, 54, 0.7);
-    }
-  `
-  document.head.appendChild(style)
 }
