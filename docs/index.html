@@ -1170,71 +1170,75 @@
           </div>
 
           <!-- Search Page -->
-            <div id="search-page" class="page-content hidden">
-                <div class="flex flex-col items-center justify-center mb-8 pt-6">
-                    <div class="flex items-center mb-2">
-                        <span class="material-icons text-2xl bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent mr-2">search</span>
-                        <h1 class="text-2xl font-bold text-white">APIs</h1>
-                    </div>
-                </div>
+          <div id="search-page" class="page-content hidden">
+              <div class="flex flex-col items-center justify-center mb-10 pt-8">
+                  <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">APIs</h1>
+                  <div class="w-16 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mt-2"></div>
+              </div>
 
-                <div class="max-w-3xl mx-auto mb-8">
-                    <div class="relative">
-                        <input 
-                            type="text" 
-                            id="global-search" 
-                            class="premium-input w-full px-4 py-4 text-base text-gray-200 rounded-full focus:outline-none pl-12 pr-10 transition-all duration-300 shadow-lg" 
-                            placeholder="Search APIs..."
-                            aria-label="Search APIs">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg class="w-6 h-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                        </div>
-                        <button 
-                            id="global-clear-search" 
-                            class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200 opacity-0 pointer-events-none"
-                            aria-label="Clear search">
-                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+              <div class="max-w-3xl mx-auto mb-10">
+                  <div class="relative group">
+                      <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full opacity-75 blur-sm group-hover:opacity-100 transition duration-300"></div>
+                      <div class="relative">
+                          <input 
+                              type="text" 
+                              id="global-search" 
+                              class="premium-input w-full px-6 py-4 text-base text-gray-200 bg-dark-800 border border-gray-700 rounded-full focus:outline-none pl-12 pr-10 transition-all duration-300 shadow-lg backdrop-blur-sm group-hover:shadow-xl"
+                              placeholder="Search for API endpoints..."
+                              aria-label="Search APIs">
+                          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <svg class="w-5 h-5 text-gray-400 group-hover:text-purple-400 transition-colors duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                  <circle cx="11" cy="11" r="8"></circle>
+                                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                              </svg>
+                          </div>
+                          <button 
+                              id="global-clear-search" 
+                              class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-200 transition-colors duration-200 opacity-0 pointer-events-none"
+                              aria-label="Clear search">
+                              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                              </svg>
+                          </button>
+                      </div>
+                  </div>
+              </div>
 
-                <div id="search-info" class="max-w-3xl mx-auto mb-4 text-sm text-gray-400 hidden">
-                    <span id="search-count">0</span> results found
-                </div>
+              <div id="search-info" class="max-w-3xl mx-auto mb-4 text-sm text-gray-400 hidden opacity-0 animate-fade-in">
+                  <div class="flex items-center">
+                      <div class="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
+                      <span id="search-count">0</span> results found
+                  </div>
+              </div>
 
-                <div id="global-search-results" class="max-w-3xl mx-auto" role="region" aria-live="polite">
-                    <!-- Search results will be populated here -->
-                </div>
+              <div id="global-search-results" class="max-w-3xl mx-auto space-y-3" role="region" aria-live="polite">
+                  <!-- Search results will be populated here -->
+              </div>
 
-                <div id="global-no-results" class="max-w-3xl mx-auto p-8 text-center hidden">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-dark-700 mb-4">
-                        <svg class="w-8 h-8 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="8" y1="12" x2="16" y2="12"></line>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-medium text-white mb-2">No results found</h3>
-                    <p class="text-gray-400">Try different keywords or check for typos</p>
-                </div>
+              <div id="global-no-results" class="max-w-3xl mx-auto p-10 text-center hidden">
+                  <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-dark-700 to-dark-800 mb-6 shadow-lg">
+                      <svg class="w-10 h-10 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="8" y1="12" x2="16" y2="12"></line>
+                      </svg>
+                  </div>
+                  <h3 class="text-2xl font-medium text-white mb-3">No results found</h3>
+                  <p class="text-gray-400">Try different keywords or check for typos</p>
+              </div>
 
-                <div id="search-initial-state" class="max-w-3xl mx-auto p-8 text-center">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-dark-700 mb-4">
-                        <svg class="w-8 h-8 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-medium text-white mb-2">Search APIs</h3>
-                    <p class="text-gray-400">Type in the box above to find API endpoints, categories, and descriptions</p>
-                </div>
-            </div>
-
+              <div id="search-initial-state" class="max-w-3xl mx-auto p-10 text-center">
+                  <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-dark-700 to-dark-800 mb-6 shadow-lg">
+                      <svg class="w-10 h-10 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <circle cx="11" cy="11" r="8"></circle>
+                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                  </div>
+                  <h3 class="text-2xl font-medium text-white mb-3">Discover API Endpoints</h3>
+                  <p class="text-gray-400">Type in the search box above to find API endpoints, categories, and descriptions</p>
+              </div>
+          </div>
+          
           <!-- API Detail Page -->
           <div id="api-detail-page" class="page-content hidden">
               <button id="back-to-apis" class="back-button">
