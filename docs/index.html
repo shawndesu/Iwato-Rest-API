@@ -22,8 +22,8 @@
                           400: '#4A4A5A',
                       },
                       accent: {
-                          primary: '#6366F1',
-                          secondary: '#4F46E5',
+                          primary: '#8B5CF6', /* Purple */
+                          secondary: '#7C3AED', /* Darker purple */
                           purple: '#8B5CF6',
                           pink: '#EC4899'
                       }
@@ -67,6 +67,7 @@
           font-family: 'Inter', sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
+          color: #E9D5FF; /* Light purple text color for main text */
       }
 
       /* Custom scrollbar for dark theme */
@@ -78,11 +79,11 @@
           background: #121218;
       }
       ::-webkit-scrollbar-thumb {
-          background: #2A2A36;
+          background: #8B5CF6; /* Purple scrollbar */
           border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
-          background: #3A3A48;
+          background: #A78BFA; /* Lighter purple on hover */
       }
 
       .api-card {
@@ -109,7 +110,7 @@
           inset: 0;
           border-radius: 0.75rem;
           padding: 1px;
-          background: linear-gradient(45deg, #6366F1, #8B5CF6, #EC4899);
+          background: linear-gradient(45deg, #8B5CF6, #A78BFA, #EC4899); /* Updated gradient */
           -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
           -webkit-mask-composite: xor;
           mask-composite: exclude;
@@ -151,7 +152,7 @@
       }
 
       .notification-item.unread {
-          background-color: rgba(99, 102, 241, 0.05);
+          background-color: rgba(139, 92, 246, 0.05); /* Updated to purple */
       }
 
       /* Center notification badge on icon */
@@ -162,7 +163,7 @@
           min-width: 18px;
           height: 18px;
           padding: 0 4px;
-          background-color: #EF4444;
+          background-color: #EC4899; /* Changed to pink */
           color: white;
           border-radius: 9999px;
           font-size: 10px;
@@ -249,7 +250,7 @@
           padding: 0.5rem;
           border-radius: 0.375rem;
           background-color: #1E1E26;
-          color: #A0A0A0;
+          color: #A78BFA; /* Light purple */
           transition: all 0.2s ease;
       }
 
@@ -259,7 +260,7 @@
       }
 
       .copy-button.copied {
-          background-color: #059669;
+          background-color: #8B5CF6; /* Changed to purple */
           color: white;
       }
 
@@ -290,11 +291,11 @@
       }
 
       .toast-success {
-          border-left: 4px solid #10B981;
+          border-left: 4px solid #8B5CF6; /* Changed to purple */
       }
 
       .toast-error {
-          border-left: 4px solid #EF4444;
+          border-left: 4px solid #EC4899; /* Changed to pink */
       }
 
       /* Notification hover effect */
@@ -338,9 +339,9 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(45deg, #6366F1, #8B5CF6, #EC4899);
+          background: linear-gradient(45deg, #8B5CF6, #A78BFA, #EC4899); /* Updated gradient */
           border-radius: 9999px;
-          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+          box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); /* Updated shadow color */
           padding: 6px;
       }
 
@@ -358,11 +359,11 @@
       }
 
       #api-search:focus {
-          box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1); /* Updated focus color */
       }
 
       #api-search:focus + div svg {
-          color: #6366F1;
+          color: #8B5CF6; /* Updated focus color */
       }
 
       #api-search:not(:placeholder-shown) + div + #clear-search {
@@ -403,22 +404,22 @@
 
       .search-result-item:hover {
           background-color: rgba(255, 255, 255, 0.03);
-          border-left-color: #6366F1;
+          border-left-color: #8B5CF6; /* Updated to purple */
       }
 
       .search-result-item .result-title {
           font-weight: 500;
-          color: white;
+          color: #DDD6FE; /* Light purple */
           margin-bottom: 2px;
       }
 
       .search-result-item .result-path {
           font-size: 0.75rem;
-          color: #9CA3AF;
+          color: #C4B5FD; /* Very light purple */
       }
 
       .search-highlight {
-          color: #6366F1;
+          color: #EC4899; /* Pink highlight */
           font-weight: 500;
       }
 
@@ -461,7 +462,7 @@
 
       .sidebar-item:hover, .sidebar-item.active {
           background-color: rgba(255, 255, 255, 0.03);
-          border-left-color: #6366F1;
+          border-left-color: #8B5CF6; /* Updated to purple */
       }
 
       /* Improved banner */
@@ -478,11 +479,16 @@
           border: 1px solid rgba(255, 255, 255, 0.05);
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
           transition: all 0.3s ease;
+          color: #DDD6FE; /* Light purple text */
       }
 
       .premium-input:focus {
-          border-color: rgba(99, 102, 241, 0.5);
-          box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25), 0 2px 6px rgba(0, 0, 0, 0.1);
+          border-color: rgba(139, 92, 246, 0.5); /* Updated to purple */
+          box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25), 0 2px 6px rgba(0, 0, 0, 0.1); /* Updated to purple */
+      }
+
+      .premium-input::placeholder {
+          color: #A78BFA80; /* Semi-transparent light purple */
       }
 
       /* Improved buttons */
@@ -514,19 +520,19 @@
 
       .notification-title {
           font-weight: 600;
-          color: white;
+          color: #DDD6FE; /* Light purple */
           font-size: 0.9rem;
       }
 
       .notification-action {
-          color: #6366F1;
+          color: #8B5CF6; /* Updated to purple */
           font-size: 0.75rem;
           font-weight: 500;
           transition: color 0.2s ease;
       }
 
       .notification-action:hover {
-          color: #4F46E5;
+          color: #EC4899; /* Pink on hover */
       }
 
       .notification-empty {
@@ -546,7 +552,7 @@
       }
 
       .notification-empty-text {
-          color: #9CA3AF;
+          color: #A78BFA; /* Light purple */
           font-size: 0.875rem;
       }
 
@@ -571,7 +577,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(45deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+          background: linear-gradient(45deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2)); /* Updated gradient */
           border-radius: 10px;
           margin-right: 12px;
       }
@@ -583,6 +589,7 @@
           padding: 4px 10px;
           font-size: 0.75rem;
           font-weight: 500;
+          color: #F5D0FE; /* Light pink */
       }
 
       /* API Detail Page Styles */
@@ -606,7 +613,7 @@
       .api-detail-section-title {
           font-size: 1.125rem;
           font-weight: 600;
-          color: white;
+          color: #DDD6FE; /* Light purple */
           margin-bottom: 1rem;
           display: flex;
           align-items: center;
@@ -614,7 +621,7 @@
 
       .api-detail-section-title .material-icons {
           margin-right: 0.5rem;
-          color: #6366F1;
+          color: #8B5CF6; /* Updated to purple */
       }
 
       .back-button {
@@ -624,7 +631,7 @@
           background: rgba(30, 30, 38, 0.7);
           border: 1px solid rgba(255, 255, 255, 0.05);
           border-radius: 0.5rem;
-          color: white;
+          color: #DDD6FE; /* Light purple */
           font-weight: 500;
           transition: all 0.2s ease;
           margin-bottom: 1rem;
@@ -633,6 +640,7 @@
       .back-button:hover {
           background: rgba(42, 42, 54, 0.7);
           transform: translateY(-2px);
+          color: #F5D0FE; /* Light pink on hover */
       }
 
       .back-button .material-icons {
@@ -677,7 +685,7 @@
           height: 40px;
           border-radius: 50%;
           border: 3px solid transparent;
-          border-bottom-color: #6366F1;
+          border-bottom-color: #8B5CF6; /* Updated to purple */
       }
 
       @keyframes rotation {
@@ -692,22 +700,22 @@
       /* Premium button styles */
       .premium-button {
           position: relative;
-          background: linear-gradient(45deg, #6366F1, #8B5CF6, #EC4899);
+          background: linear-gradient(45deg, #8B5CF6, #A78BFA, #EC4899); /* Updated gradient */
           border-radius: 9999px;
           color: white;
           overflow: hidden;
           transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+          box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); /* Updated shadow color */
       }
 
       .premium-button:hover {
           transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+          box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4); /* Updated shadow color */
       }
 
       .premium-button:active {
           transform: translateY(0);
-          box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+          box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3); /* Updated shadow color */
       }
 
       /* Tooltip styles */
@@ -720,7 +728,7 @@
           width: auto;
           min-width: 120px;
           background-color: #2A2A36;
-          color: white;
+          color: #DDD6FE; /* Light purple */
           text-align: center;
           border-radius: 6px;
           padding: 5px 10px;
@@ -837,16 +845,18 @@
           margin: 0;
           font-size: 0.95rem; /* Smaller font size */
           font-weight: 600;
-          color: white;
+          color: #DDD6FE; /* Light purple */
       }
 
       .accordion-icon {
           transition: transform 0.3s ease;
           font-size: 1.25rem; /* Smaller icon */
+          color: #A78BFA; /* Light purple */
       }
 
       .accordion-header.active .accordion-icon {
           transform: rotate(180deg);
+          color: #EC4899; /* Pink when active */
       }
 
       .accordion-content {
@@ -874,16 +884,20 @@
 
       .endpoint-card h5 {
           font-size: 0.9rem !important; /* Smaller title */
+          color: #DDD6FE !important; /* Light purple */
       }
 
       .endpoint-card p {
           font-size: 0.75rem !important; /* Smaller description */
           margin-top: 0.25rem !important; /* Less spacing */
+          color: #C4B5FD !important; /* Very light purple */
       }
 
       .endpoint-card button {
           padding: 0.35rem 0.75rem !important; /* Smaller button */
           font-size: 0.75rem !important; /* Smaller text */
+          background: linear-gradient(45deg, #8B5CF6, #EC4899) !important; /* Purple to pink gradient */
+          color: white !important;
       }
 
       /* Fix for API response container to prevent horizontal scrolling */
@@ -898,6 +912,7 @@
           overflow-x: auto;
           word-wrap: break-word;
           white-space: pre-wrap;
+          color: #E9D5FF; /* Light purple text */
       }
 
       #detail-response-data pre {
@@ -913,11 +928,11 @@
 
       /* Improved JSON formatting */
       .json-key {
-          color: #6366F1;
+          color: #8B5CF6; /* Purple */
       }
 
       .json-string {
-          color: #10B981;
+          color: #F5D0FE; /* Light pink */
       }
 
       .json-number {
@@ -925,11 +940,11 @@
       }
 
       .json-boolean {
-          color: #8B5CF6;
+          color: #8B5CF6; /* Purple */
       }
 
       .json-null {
-          color: #EC4899;
+          color: #EC4899; /* Pink */
       }
 
       /* Optimized sidebar footer for mobile browsers */
@@ -965,9 +980,52 @@
               border-top: 1px solid rgba(255, 255, 255, 0.05);
           }
       }
+
+      /* Text gradient effects for headings */
+      .text-gradient {
+          background: linear-gradient(to right, #8B5CF6, #EC4899);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          display: inline-block;
+      }
+
+      /* Paragraph text styling */
+      p {
+          color: #E9D5FF; /* Light purple for all paragraph text */
+      }
+
+      /* Heading text styling */
+      h1, h2, h3, h4, h5, h6 {
+          color: #F5D0FE; /* Light pink for all headings */
+      }
+
+      /* Link styling */
+      a {
+          color: #A78BFA; /* Light purple for links */
+          transition: color 0.2s ease;
+      }
+
+      a:hover {
+          color: #EC4899; /* Pink on hover */
+      }
+
+      /* Code and pre styling */
+      code, pre {
+          color: #F5D0FE; /* Light pink for code */
+          background-color: rgba(139, 92, 246, 0.1); /* Very light purple background */
+          border-radius: 4px;
+          padding: 0.1em 0.3em;
+          font-family: monospace;
+      }
+
+      pre {
+          padding: 1em;
+          overflow-x: auto;
+      }
   </style>
 </head>
-<body class="bg-dark-900 text-gray-200 min-h-screen transition-all duration-300">
+<body class="bg-dark-900 min-h-screen transition-all duration-300">
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
   <div id="page-loader" class="page-loader">
       <div class="loader"></div>
@@ -989,53 +1047,53 @@
                   </svg>
               </div>
               <div>
-                  <h1 id="sidebar-title" class="text-base font-bold text-white">API Documentation</h1>
-                  <p class="text-xs text-gray-400">Premium Dashboard</p>
+                  <h1 id="sidebar-title" class="text-base font-bold text-gradient">API Documentation</h1>
+                  <p class="text-xs">Premium Dashboard</p>
               </div>
           </div>
       </div>
 
       <div class="py-5">
           <nav>
-              <a href="#" class="nav-link sidebar-item flex items-center px-5 py-3 text-gray-200 hover:bg-dark-700 transition-colors duration-200 group" data-page="home">
+              <a href="#" class="nav-link sidebar-item flex items-center px-5 py-3 hover:bg-dark-700 transition-colors duration-200 group" data-page="home">
                   <div class="w-6 h-6 mr-3 flex-shrink-0">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
                           <path d="M10.5 19.5V14.5H13.5V19.5H18V12.5H20.5L12 4.5L3.5 12.5H6V19.5H10.5Z" fill="url(#homeGradient)" />
                           <defs>
                               <linearGradient id="homeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                   <stop offset="0%" stop-color="#8B5CF6" />
-                                  <stop offset="50%" stop-color="#EC4899" />
-                                  <stop offset="100%" stop-color="#6366F1" />
+                                  <stop offset="50%" stop-color="#A78BFA" />
+                                  <stop offset="100%" stop-color="#EC4899" />
                               </linearGradient>
                           </defs>
                       </svg>
                   </div>
                   <span>Home</span>
               </a>
-              <a href="#" class="nav-link sidebar-item flex items-center px-5 py-3 text-gray-400 hover:bg-dark-700 hover:text-gray-200 transition-colors duration-200 group" data-page="stats">
+              <a href="#" class="nav-link sidebar-item flex items-center px-5 py-3 hover:bg-dark-700 hover:text-gray-200 transition-colors duration-200 group" data-page="stats">
                   <div class="w-6 h-6 mr-3 flex-shrink-0">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
                           <path d="M3 13.5H7V19.5H3V13.5ZM10 10.5H14V19.5H10V10.5ZM17 3.5H21V19.5H17V3.5Z" fill="url(#statsGradient)" />
                           <defs>
                               <linearGradient id="statsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                   <stop offset="0%" stop-color="#8B5CF6" />
-                                  <stop offset="50%" stop-color="#EC4899" />
-                                  <stop offset="100%" stop-color="#6366F1" />
+                                  <stop offset="50%" stop-color="#A78BFA" />
+                                  <stop offset="100%" stop-color="#EC4899" />
                               </linearGradient>
                           </defs>
                       </svg>
                   </div>
                   <span>Stats</span>
               </a>
-              <a href="#" class="nav-link sidebar-item flex items-center px-5 py-3 text-gray-400 hover:bg-dark-700 hover:text-gray-200 transition-colors duration-200 group" data-page="search">
+              <a href="#" class="nav-link sidebar-item flex items-center px-5 py-3 hover:bg-dark-700 hover:text-gray-200 transition-colors duration-200 group" data-page="search">
     <div class="w-6 h-6 mr-3 flex-shrink-0">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
             <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="url(#searchGradient)" />
             <defs>
                 <linearGradient id="searchGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#8B5CF6" />
-                    <stop offset="50%" stop-color="#EC4899" />
-                    <stop offset="100%" stop-color="#6366F1" />
+                    <stop offset="50%" stop-color="#A78BFA" />
+                    <stop offset="100%" stop-color="#EC4899" />
                 </linearGradient>
             </defs>
         </svg>
@@ -1048,10 +1106,10 @@
       <div class="sidebar-footer absolute bottom-0 left-0 right-0 p-5 border-t border-dark-600">
           <div class="gradient-border">
               <div class="p-4 rounded-lg bg-dark-800">
-                  <h4 class="text-sm font-medium text-white mb-1">Premium Dashboard</h4>
-                  <p class="text-xs text-gray-400 mb-3">No authentication required</p>
+                  <h4 class="text-sm font-medium text-gradient mb-1">Premium Dashboard</h4>
+                  <p class="text-xs mb-3">No authentication required</p>
                   <div class="w-full bg-dark-600 rounded-full h-1.5">
-                      <div class="bg-gradient-to-r from-accent-primary via-accent-purple to-accent-pink h-1.5 rounded-full" style="width: 100%"></div>
+                      <div class="bg-gradient-to-r from-accent-purple via-purple-400 to-accent-pink h-1.5 rounded-full" style="width: 100%"></div>
                   </div>
               </div>
           </div>
@@ -1073,8 +1131,8 @@
                   </div>
               </button>
               <div>
-                  <h1 id="page-title" class="text-base font-bold text-white">Home</h1>
-                  <p class="text-xs text-gray-400">Premium Dashboard</p>
+                  <h1 id="page-title" class="text-base font-bold text-gradient">Home</h1>
+                  <p class="text-xs">Premium Dashboard</p>
               </div>
           </div>
 
@@ -1110,17 +1168,17 @@
           <!-- Home Page -->
           <div id="home-page" class="page-content">
               <div id="banner" class="premium-banner relative p-8 py-10 w-full mb-8 rounded-lg hero-card">
-                  <div class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-accent-primary rounded-full"></div>
-                  <div class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-accent-primary rounded-full"></div>
-                  <div class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-accent-primary rounded-full"></div>
-                  <div class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-accent-primary rounded-full"></div>
+                  <div class="absolute -top-1.5 -left-1.5 w-3 h-3 bg-accent-purple rounded-full"></div>
+                  <div class="absolute -top-1.5 -right-1.5 w-3 h-3 bg-accent-pink rounded-full"></div>
+                  <div class="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-accent-pink rounded-full"></div>
+                  <div class="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-accent-purple rounded-full"></div>
 
                   <div class="flex flex-wrap items-center gap-3 mb-4">
-                      <h2 id="api-name" class="text-3xl font-bold text-white">API Documentation</h2>
-                      <div id="api-author" class="bg-gradient-to-r from-accent-primary via-accent-purple to-accent-pink text-white text-xs font-semibold px-3 py-1.5 rounded-full shrink-0 shadow-md">by Author</div>
+                      <h2 id="api-name" class="text-3xl font-bold text-gradient">API Documentation</h2>
+                      <div id="api-author" class="bg-gradient-to-r from-accent-purple via-purple-400 to-accent-pink text-white text-xs font-semibold px-3 py-1.5 rounded-full shrink-0 shadow-md">by Author</div>
                   </div>
-                  <p id="api-desc" class="text-sm text-gray-300 mb-3">Comprehensive API documentation for developers</p>
-                  <div id="api-links" class="flex flex-col gap-1.5 text-xs text-gray-400"></div>
+                  <p id="api-desc" class="text-sm mb-3">Comprehensive API documentation for developers</p>
+                  <div id="api-links" class="flex flex-col gap-1.5 text-xs"></div>
               </div>
 
               <!-- No search bar here anymore -->
@@ -1139,10 +1197,10 @@
                   <div class="glass-effect rounded-xl p-6 shadow-premium">
                       <div class="flex justify-between items-start">
                           <div>
-                              <p class="text-gray-400 text-sm font-medium mb-1">Total Categories</p>
-                              <h3 id="total-categories" class="text-3xl font-bold text-white">0</h3>
+                              <p class="text-sm font-medium mb-1">Total Categories</p>
+                              <h3 id="total-categories" class="text-3xl font-bold text-gradient">0</h3>
                           </div>
-                          <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-accent-primary via-accent-purple to-accent-pink flex items-center justify-center">
+                          <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-accent-purple via-purple-400 to-accent-pink flex items-center justify-center">
                               <span class="material-icons text-white">category</span>
                           </div>
                       </div>
@@ -1151,10 +1209,10 @@
                   <div class="glass-effect rounded-xl p-6 shadow-premium">
                       <div class="flex justify-between items-start">
                           <div>
-                              <p class="text-gray-400 text-sm font-medium mb-1">Total APIs</p>
-                              <h3 id="total-apis" class="text-3xl font-bold text-white">0</h3>
+                              <p class="text-sm font-medium mb-1">Total APIs</p>
+                              <h3 id="total-apis" class="text-3xl font-bold text-gradient">0</h3>
                           </div>
-                          <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-accent-primary via-accent-purple to-accent-pink flex items-center justify-center">
+                          <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-accent-purple via-purple-400 to-accent-pink flex items-center justify-center">
                               <span class="material-icons text-white">api</span>
                           </div>
                       </div>
@@ -1162,7 +1220,7 @@
               </div>
 
               <div class="glass-effect rounded-xl p-6 shadow-premium mb-8">
-                  <h3 class="text-lg font-semibold text-white mb-4">API Categories</h3>
+                  <h3 class="text-lg font-semibold text-gradient mb-4">API Categories</h3>
                   <div id="categories-list" class="space-y-4">
                       <!-- Categories will be populated by JavaScript -->
                   </div>
@@ -1183,7 +1241,7 @@
                           <input 
                               type="text" 
                               id="global-search" 
-                              class="premium-input w-full px-6 py-4 text-base text-gray-200 bg-dark-800 border border-gray-700 rounded-full focus:outline-none pl-12 pr-10 transition-all duration-300 shadow-lg backdrop-blur-sm group-hover:shadow-xl"
+                              class="premium-input w-full px-6 py-4 text-base bg-dark-800 border border-gray-700 rounded-full focus:outline-none pl-12 pr-10 transition-all duration-300 shadow-lg backdrop-blur-sm group-hover:shadow-xl"
                               placeholder="Search for API endpoints..."
                               aria-label="Search APIs">
                           <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -1205,7 +1263,7 @@
                   </div>
               </div>
 
-              <div id="search-info" class="max-w-3xl mx-auto mb-4 text-sm text-gray-400 hidden opacity-0 animate-fade-in">
+              <div id="search-info" class="max-w-3xl mx-auto mb-4 text-sm hidden opacity-0 animate-fade-in">
                   <div class="flex items-center">
                       <div class="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
                       <span id="search-count">0</span> results found
@@ -1223,8 +1281,8 @@
                           <line x1="8" y1="12" x2="16" y2="12"></line>
                       </svg>
                   </div>
-                  <h3 class="text-2xl font-medium text-white mb-3">No results found</h3>
-                  <p class="text-gray-400">Try different keywords or check for typos</p>
+                  <h3 class="text-2xl font-medium text-gradient mb-3">No results found</h3>
+                  <p>Try different keywords or check for typos</p>
               </div>
 
               <div id="search-initial-state" class="max-w-3xl mx-auto p-10 text-center">
@@ -1234,11 +1292,11 @@
                           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                       </svg>
                   </div>
-                  <h3 class="text-2xl font-medium text-white mb-3">Discover API Endpoints</h3>
-                  <p class="text-gray-400">Type in the search box above to find API endpoints, categories, and descriptions</p>
+                  <h3 class="text-2xl font-medium text-gradient mb-3">Discover API Endpoints</h3>
+                  <p>Type in the search box above to find API endpoints, categories, and descriptions</p>
               </div>
           </div>
-          
+
           <!-- API Detail Page -->
           <div id="api-detail-page" class="page-content hidden">
               <button id="back-to-apis" class="back-button">
@@ -1248,20 +1306,20 @@
 
               <div class="api-detail-header">
                   <div class="flex items-center mb-3">
-                      <span id="detail-api-method" class="px-3 py-1.5 text-xs font-medium bg-blue-900 text-blue-200 rounded-full mr-3">GET</span>
-                      <h2 id="detail-api-title" class="text-2xl font-bold text-white">API Title</h2>
+                      <span id="detail-api-method" class="px-3 py-1.5 text-xs font-medium bg-purple-900 text-purple-200 rounded-full mr-3">GET</span>
+                      <h2 id="detail-api-title" class="text-2xl font-bold text-gradient">API Title</h2>
                   </div>
-                  <p id="detail-api-description" class="text-gray-300 mb-4">API description will appear here</p>
+                  <p id="detail-api-description" class="mb-4">API description will appear here</p>
 
                   <div id="detail-endpoint-display" class="relative">
                       <div class="flex justify-between items-center mb-2">
-                          <h4 class="text-sm font-medium text-white">Endpoint</h4>
+                          <h4 class="text-sm font-medium text-gradient">Endpoint</h4>
                           <button id="detail-copy-endpoint" class="copy-button tooltip">
                               <span class="material-icons text-sm">content_copy</span>
                               <span class="tooltip-text">Copy to clipboard</span>
                           </button>
                       </div>
-                      <div class="bg-dark-900 border border-dark-600 rounded-lg p-4 text-xs text-gray-300 overflow-auto">
+                      <div class="bg-dark-900 border border-dark-600 rounded-lg p-4 text-xs overflow-auto">
                           <code id="detail-endpoint-url" class="font-mono break-all"></code>
                       </div>
                   </div>
@@ -1287,11 +1345,11 @@
                   <div class="flex items-center justify-between mb-3">
                       <div class="flex items-center">
                           <span id="detail-response-status" class="px-2.5 py-1 text-xs font-medium bg-green-900 text-green-200 rounded-full mr-2">200</span>
-                          <span id="detail-response-time" class="text-xs text-gray-400">200ms</span>
+                          <span id="detail-response-time" class="text-xs">200ms</span>
                       </div>
                   </div>
                   <div id="detail-response-wrapper" class="relative">
-                      <div id="detail-response-data" class="bg-dark-900 border border-dark-600 rounded-lg p-4 text-xs text-gray-300 overflow-auto"></div>
+                      <div id="detail-response-data" class="bg-dark-900 border border-dark-600 rounded-lg p-4 text-xs overflow-auto"></div>
                       <div id="detail-response-actions" class="absolute top-2 right-2 flex gap-2">
                           <!-- Copy or download button will be added here -->
                       </div>
@@ -1312,3 +1370,4 @@
   <script src="/script.js"></script>
 </body>
 </html>
+
