@@ -68,6 +68,7 @@
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
           color: #E9D5FF; /* Light purple text color for main text */
+          background-color: #0A0A0C;
       }
 
       /* Custom scrollbar for dark theme */
@@ -87,14 +88,9 @@
       }
 
       .api-card {
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
           backdrop-filter: blur(8px);
           border: 1px solid rgba(255, 255, 255, 0.05);
-      }
-
-      .api-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.3);
       }
 
       .gradient-border {
@@ -234,12 +230,6 @@
 
       .page-content:not(.hidden) {
           opacity: 1;
-      }
-
-      /* Button styles */
-      .ripple-button {
-          position: relative;
-          overflow: hidden;
       }
 
       /* Copy button styles */
@@ -446,12 +436,6 @@
           backdrop-filter: blur(10px);
           border: 1px solid rgba(255, 255, 255, 0.05);
           box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.3);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-
-      .hero-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.4);
       }
 
       /* Improved sidebar */
@@ -501,12 +485,7 @@
 
       .premium-icon-button:hover {
           background: rgba(42, 42, 54, 0.5);
-          transform: translateY(-2px);
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-      }
-
-      .premium-icon-button:active {
-          transform: translateY(0);
       }
 
       /* Improved notification dropdown */
@@ -563,12 +542,6 @@
           border: 1px solid rgba(255, 255, 255, 0.05);
           border-radius: 0.5rem;
           padding: 1rem;
-          transition: all 0.3s ease;
-      }
-
-      .category-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.4);
       }
 
       .category-icon {
@@ -639,7 +612,6 @@
 
       .back-button:hover {
           background: rgba(42, 42, 54, 0.7);
-          transform: translateY(-2px);
           color: #F5D0FE; /* Light pink on hover */
       }
 
@@ -709,13 +681,7 @@
       }
 
       .premium-button:hover {
-          transform: translateY(-2px);
           box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4); /* Updated shadow color */
-      }
-
-      .premium-button:active {
-          transform: translateY(0);
-          box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3); /* Updated shadow color */
       }
 
       /* Tooltip styles */
@@ -837,7 +803,6 @@
 
       .accordion-header:hover {
           background: rgba(42, 42, 54, 0.7);
-          transform: translateY(-2px);
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
       }
 
@@ -1086,20 +1051,20 @@
                   <span>Stats</span>
               </a>
               <a href="#" class="nav-link sidebar-item flex items-center px-5 py-3 hover:bg-dark-700 hover:text-gray-200 transition-colors duration-200 group" data-page="search">
-    <div class="w-6 h-6 mr-3 flex-shrink-0">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="url(#searchGradient)" />
-            <defs>
-                <linearGradient id="searchGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#8B5CF6" />
-                    <stop offset="50%" stop-color="#A78BFA" />
-                    <stop offset="100%" stop-color="#EC4899" />
-                </linearGradient>
-            </defs>
-        </svg>
-    </div>
-    <span>Search</span>
-</a>
+                <div class="w-6 h-6 mr-3 flex-shrink-0">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="url(#searchGradient)" />
+                        <defs>
+                            <linearGradient id="searchGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#8B5CF6" />
+                                <stop offset="50%" stop-color="#A78BFA" />
+                                <stop offset="100%" stop-color="#EC4899" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span>Search</span>
+              </a>
           </nav>
       </div>
 
@@ -1180,8 +1145,6 @@
                   <p id="api-desc" class="text-sm mb-3">Comprehensive API documentation for developers</p>
                   <div id="api-links" class="flex flex-col gap-1.5 text-xs"></div>
               </div>
-
-              <!-- No search bar here anymore -->
 
               <!-- Separator Line -->
               <div class="w-full h-px bg-dark-600 mb-6"></div>
@@ -1370,4 +1333,3 @@
   <script src="/script.js"></script>
 </body>
 </html>
-

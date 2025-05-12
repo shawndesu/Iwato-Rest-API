@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  // Initialize ripple effect for buttons
-  initRippleEffect()
+  // Initialize page
+  initializeUI()
 
   // Prevent scrolling during initialization
   document.body.classList.add("noscroll")
@@ -20,7 +20,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     setContent("api-name", "textContent", set.name)
     setContent("api-author", "textContent", `by ${set.author}`)
     setContent("api-desc", "textContent", set.description)
-    setContent("api-links", "innerHTML", set.links ? set.links.map(link => `<a href="${link.url}" class="hover:text-white transition-colors">${link.name}</a>`).join('') : '')
+    setContent(
+      "api-links",
+      "innerHTML",
+      set.links
+        ? set.links
+            .map((link) => `<a href="${link.url}" class="hover:text-white transition-colors">${link.name}</a>`)
+            .join("")
+        : "",
+    )
 
     // Setup components
     setupApiContent(endpoints)
@@ -42,6 +50,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Hide loader after initialization
   hideLoader()
 
+  // Setup event listeners
+  setupEventListeners()
+
+  // Initialize responsive behavior on load
+  handleResponsiveLayout()
+
+  // Setup modal close functionality
+  setupModalHandlers()
+
+  // Save page state when navigating away
+  window.addEventListener("beforeunload", savePageState)
+})
+
+// Initialize UI components
+function initializeUI() {
+  // No ripple effect initialization as per request
+}
+
+// Setup all event listeners
+function setupEventListeners() {
   // Toggle sidebar functionality
   document.getElementById("toggle-sidebar").addEventListener("click", toggleSidebar)
 
@@ -50,15 +78,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Handle window resize for responsive design
   window.addEventListener("resize", handleResize)
+}
 
-  // Initialize responsive behavior on load
-  if (window.innerWidth < 768) {
-    const mainContent = document.getElementById("main-content")
-    mainContent.classList.remove("ml-64")
-    mainContent.classList.add("ml-0")
-  }
-
-  // Setup modal close functionality
+// Setup modal handlers
+function setupModalHandlers() {
   document.getElementById("close-modal").addEventListener("click", () => {
     document.getElementById("image-modal").classList.add("hidden")
   })
@@ -68,37 +91,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.currentTarget.classList.add("hidden")
     }
   })
+}
 
-  // Save page state when navigating away
-  window.addEventListener("beforeunload", savePageState)
-})
-
-// Initialize ripple effect for buttons
-function initRippleEffect() {
-  document.addEventListener("click", (e) => {
-    const target = e.target
-
-    // Find the ripple-button parent if the click was on a child element
-    const rippleButton = target.closest(".ripple-button")
-
-    if (!rippleButton) return
-
-    const rect = rippleButton.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-
-    const ripple = document.createElement("span")
-    ripple.className = "ripple"
-    ripple.style.left = `${x}px`
-    ripple.style.top = `${y}px`
-
-    rippleButton.appendChild(ripple)
-
-    // Remove the ripple element after animation completes
-    setTimeout(() => {
-      ripple.remove()
-    }, 600)
-  })
+// Handle responsive layout
+function handleResponsiveLayout() {
+  if (window.innerWidth < 768) {
+    const mainContent = document.getElementById("main-content")
+    mainContent.classList.remove("ml-64")
+    mainContent.classList.add("ml-0")
+  }
 }
 
 // Toast notification system
@@ -190,12 +191,15 @@ function savePageState() {
     const apiDesc = document.getElementById("detail-api-description").textContent
     const apiMethod = document.getElementById("detail-api-method").textContent
 
-    localStorage.setItem("apiDetailState", JSON.stringify({
-      title: apiTitle,
-      endpoint: apiEndpoint,
-      description: apiDesc,
-      method: apiMethod
-    }))
+    localStorage.setItem(
+      "apiDetailState",
+      JSON.stringify({
+        title: apiTitle,
+        endpoint: apiEndpoint,
+        description: apiDesc,
+        method: apiMethod,
+      }),
+    )
   } else {
     localStorage.removeItem("apiDetailState")
   }
@@ -234,7 +238,7 @@ function restorePageState() {
   // Restore scroll position
   const scrollPosition = localStorage.getItem("scrollPosition")
   if (scrollPosition) {
-    window.scrollTo(0, parseInt(scrollPosition, 10))
+    window.scrollTo(0, Number.parseInt(scrollPosition, 10))
   }
 }
 
@@ -619,7 +623,8 @@ function createApiItemElement(itemName, item, isLastItem) {
   itemDiv.dataset.desc = item.desc || "No description available" // Fallback description
 
   const heroSection = document.createElement("div")
-  heroSection.className = "hero-card endpoint-card flex items-center justify-between p-5 px-6 rounded-lg" // Added endpoint-card class
+  // Removed hover effects as requested
+  heroSection.className = "hero-card endpoint-card flex items-center justify-between p-5 px-6 rounded-lg"
 
   const textContent = document.createElement("div")
   textContent.className = "flex-grow mr-4 overflow-hidden"
@@ -656,14 +661,6 @@ function setupApiButtonHandlers(endpoints) {
         ? event.target
         : event.target.closest(".get-api-btn")
       const { apiPath, apiName, apiDesc } = button.dataset
-
-      const currentItem = endpoints.endpoints
-        .flatMap((category) => Object.values(category.items))
-        .map((itemData) => {
-          const itemName = Object.keys(itemData)[0]
-          return { name: itemName, ...itemData[itemName] }
-        })
-        .find((item) => item.path === apiPath && item.name === apiName)
 
       navigateToApiDetail(apiName, apiPath, apiDesc || "No description available")
 
@@ -760,7 +757,7 @@ function navigateToApiDetail(name, endpoint, description, method = "GET") {
     title: name,
     endpoint: url.href,
     description: description,
-    method: method
+    method: method,
   }
   localStorage.setItem("apiDetailState", JSON.stringify(apiDetailState))
   localStorage.setItem("currentPage", "api-detail")
@@ -778,12 +775,14 @@ function setupApiParameters(endpoint) {
       const [key] = param.split("=")
       if (key) {
         const isOptional = key.startsWith("_")
+        // Capitalize first letter of parameter name for display
+        const displayName = key.charAt(0).toUpperCase() + key.slice(1)
         const placeholderText = `Enter ${key}${isOptional ? " (optional)" : ""}`
 
         const paramField = document.createElement("div")
         paramField.className = "mb-4"
         paramField.innerHTML = `
-        <label for="param-${key}" class="block text-sm font-medium text-gray-300 mb-2">${key}</label>
+        <label for="param-${key}" class="block text-sm font-medium text-gray-300 mb-2">${displayName}</label>
         <input type='text' id='param-${key}' class='premium-input w-full px-4 py-3 text-sm text-gray-200 rounded-lg focus:outline-none transition-all duration-300' placeholder='${placeholderText}'>
         <div id='error-${key}' class='text-red-400 text-xs mt-2 hidden'>This field is required</div>
       `
@@ -796,12 +795,14 @@ function setupApiParameters(endpoint) {
       placeholderMatch.forEach((match) => {
         const paramName = match.replace(/{|}/g, "")
         const isOptional = paramName.startsWith("_")
+        // Capitalize first letter of parameter name for display
+        const displayName = paramName.charAt(0).toUpperCase() + paramName.slice(1)
         const placeholderText = `Enter ${paramName}${isOptional ? " (optional)" : ""}`
 
         const paramField = document.createElement("div")
         paramField.className = "mb-4"
         paramField.innerHTML = `
-        <label for="param-${paramName}" class="block text-sm font-medium text-gray-300 mb-2">${paramName}</label>
+        <label for="param-${paramName}" class="block text-sm font-medium text-gray-300 mb-2">${displayName}</label>
         <input type='text' id='param-${paramName}' class='premium-input w-full px-4 py-3 text-sm text-gray-200 rounded-lg focus:outline-none transition-all duration-300' placeholder='${placeholderText}'>
         <div id='error-${paramName}' class='text-red-400 text-xs mt-2 hidden'>This field is required</div>
       `
@@ -885,6 +886,9 @@ async function handleApiSubmit() {
       })
     }
   }
+
+  // Update the displayed endpoint URL with the actual parameters
+  document.getElementById("detail-endpoint-url").textContent = apiUrl
 
   responseContainer.classList.remove("hidden")
   responseData.innerHTML = `
@@ -1024,8 +1028,10 @@ async function handleApiSubmit() {
     })
     responseActions.appendChild(copyButton)
   } finally {
+    // Change the button to "Resend Request" after the request is complete
     submitBtn.disabled = false
-    submitBtn.textContent = "Send Request"
+    submitBtn.textContent = "Resend Request"
+    submitBtn.classList.add("resend-button")
 
     // Scroll to response section
     responseContainer.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -1145,8 +1151,7 @@ function setupGlobalSearch(endpoints) {
 
         items.forEach((result) => {
           const resultItem = document.createElement("div")
-          resultItem.className =
-            "search-result-item bg-dark-800 rounded-lg p-4 mb-3 border border-dark-600 hover:border-accent-primary transition-colors duration-200"
+          resultItem.className = "search-result-item bg-dark-800 rounded-lg p-4 mb-3 border border-dark-600"
 
           // Highlight the matching text
           const titleWithHighlight = highlightMatch(result.title, query)
@@ -1248,7 +1253,11 @@ function setupGlobalSearch(endpoints) {
 
   // Restore search query if available
   const savedSearchQuery = localStorage.getItem("currentSearchQuery")
-  if (savedSearchQuery && document.getElementById("search-page") && !document.getElementById("search-page").classList.contains("hidden")) {
+  if (
+    savedSearchQuery &&
+    document.getElementById("search-page") &&
+    !document.getElementById("search-page").classList.contains("hidden")
+  ) {
     searchInput.value = savedSearchQuery
     clearSearchBtn.classList.remove("opacity-0", "pointer-events-none")
     performSearch(savedSearchQuery)
