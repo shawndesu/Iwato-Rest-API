@@ -46,8 +46,8 @@ const chalk = require('chalk');
   String.prototype.capitalize = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
   };
-  
-  function loadEndpointsFromDirectory(directory, baseRoute = '') {
+
+  function loadEndpointsFromDirectory(directory, categoryPath = '') {
     let endpoints = [];
     const fullPath = path.join(__dirname, directory);
 
@@ -62,16 +62,19 @@ const chalk = require('chalk');
       const stats = fs.statSync(itemPath);
 
       if (stats.isDirectory()) {
+        // Track category hierarchy for documentation but not for routes
+        const subCategory = categoryPath ? `${categoryPath}/${item}` : item;
         logger.info(`Found subdirectory: ${item}`);
         endpoints = endpoints.concat(
-          loadEndpointsFromDirectory(path.join(directory, item), `${baseRoute}/${item}`)
+          loadEndpointsFromDirectory(path.join(directory, item), subCategory)
         );
       } else if (stats.isFile() && item.endsWith('.js')) {
         try {
           const mod = require(itemPath);
           if (mod && typeof mod.onStart === 'function') {
             const name = item.replace('.js', '');
-            const route = `${baseRoute}/${name}`;
+            // Create route using just /api/endpoint-name without category folders
+            const route = `/api/${name}`;
 
             // wrap express handler
             app.all(route, async (req, res, next) => {
@@ -87,7 +90,8 @@ const chalk = require('chalk');
               displayPath += '?' + mod.meta.params.map(p => `${p}=`).join('&');
             }
 
-            const cat = mod.meta.category || 'Other';
+            // Use category from metadata or derive from folder structure
+            const cat = mod.meta.category || (categoryPath || 'Other');
             let bucket = endpoints.find(e => e.name === cat);
             if (!bucket) {
               bucket = { name: cat, items: [] };
