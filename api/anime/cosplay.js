@@ -1,10 +1,10 @@
 const axios = require('axios');
 
 const meta = {
-    name: 'Cosplay',
-    desc: 'Get random cosplay video',
+    name: 'cosplay',
+    desc: 'get random cosplay video',
     method: 'get',
-    category: 'Anime',
+    category: 'anime',
     params: []
 };
 

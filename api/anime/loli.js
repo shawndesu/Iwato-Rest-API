@@ -2,10 +2,10 @@
 const axios = require('axios');
 
 const meta = {
-    name: 'Loli',
-    desc: 'Loli random image',
+    name: 'loli',
+    desc: 'loli random image',
     method: 'get',
-    category: 'Anime',
+    category: 'anime',
 };
 
 async function onStart({ req, res }) {

@@ -1,10 +1,10 @@
 const meta = {
-  name: "Example",
+  name: "example",
   version: "1.0.0",
-  description: "A simple example API that demonstrates basic functionality",
-  author: "Your Name", 
+  description: "a simple example API that demonstrates basic functionality",
+  author: "your name", 
   method: "get",
-  category: "Example",
+  category: "example",
   path: "/example?text="
 };
 

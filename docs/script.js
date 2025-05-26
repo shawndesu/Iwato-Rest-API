@@ -63,6 +63,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.addEventListener("beforeunload", savePageState)
 })
 
+// Function to capitalize first letter of each word
+function capitalizeWords(text) {
+  if (!text) return ""
+  return text.replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
 // Initialize UI components
 function initializeUI() {
   // No ripple effect initialization as per request
@@ -153,8 +159,8 @@ function setupNavigation() {
       this.classList.add("bg-dark-700", "text-gray-200")
       this.classList.remove("text-gray-400")
 
-      // Update page title
-      pageTitle.textContent = pageToShow.charAt(0).toUpperCase() + pageToShow.slice(1)
+      // Update page title with proper capitalization
+      pageTitle.textContent = capitalizeWords(pageToShow)
 
       // Hide all pages
       document.querySelectorAll(".page-content").forEach((page) => {
@@ -255,7 +261,7 @@ function updateStats(endpoints) {
       const categoryItems = Object.keys(category.items).length
       totalApis += categoryItems
 
-      // Add category to the categories list
+      // Add category to the categories list with proper capitalization
       const categoryItem = document.createElement("div")
       categoryItem.className = "category-card flex justify-between items-center"
       categoryItem.innerHTML = `
@@ -263,7 +269,7 @@ function updateStats(endpoints) {
         <div class="category-icon">
           <span class="material-icons text-white">folder</span>
         </div>
-        <span class="text-white font-medium">${category.name}</span>
+        <span class="text-white font-medium">${capitalizeWords(category.name)}</span>
       </div>
       <div class="category-count text-gray-300">
         ${categoryItems} APIs
@@ -439,11 +445,11 @@ function setupNotifications(notifications) {
 
     notificationItem.innerHTML = `
     <div class="flex justify-between items-start">
-      <h4 class="font-medium text-white">${notification.title}</h4>
+      <h4 class="font-medium text-white">${capitalizeWords(notification.title)}</h4>
       <span class="text-xs text-gray-400">${notification.time || ""}</span>
     </div>
-    <p class="text-sm text-gray-400 mt-1">${notification.message}</p>
-    ${!notification.read ? '<button class="mark-read text-xs text-accent-primary hover:text-accent-secondary mt-2 flex items-center"><span class="material-icons" style="font-size: 16px; margin-right: 4px;">check_circle</span>Mark as read</button>' : ""}
+    <p class="text-sm text-gray-400 mt-1">${capitalizeWords(notification.message)}</p>
+    ${!notification.read ? '<button class="mark-read text-xs text-accent-primary hover:text-accent-secondary mt-2 flex items-center"><span class="material-icons" style="font-size: 16px; margin-right: 4px;">check_circle</span>Mark As Read</button>' : ""}
   `
 
     // Make the entire notification item clickable to mark as read
@@ -463,7 +469,7 @@ function setupNotifications(notifications) {
         readStates[notification.id] = true
         localStorage.setItem("notification-read-states", JSON.stringify(readStates))
 
-        showToast("Notification marked as read", "success")
+        showToast("Notification Marked As Read", "success")
       }
     })
 
@@ -488,7 +494,7 @@ function setupNotifications(notifications) {
       readStates[notificationId] = true
       localStorage.setItem("notification-read-states", JSON.stringify(readStates))
 
-      showToast("Notification marked as read", "success")
+      showToast("Notification Marked As Read", "success")
     })
   })
 
@@ -510,7 +516,7 @@ function setupNotifications(notifications) {
     localStorage.setItem("notification-read-states", JSON.stringify(readStates))
 
     notificationBadge.style.display = "none"
-    showToast("All notifications marked as read", "success")
+    showToast("All Notifications Marked As Read", "success")
   })
 }
 
@@ -549,13 +555,13 @@ function setupApiContent(endpoints) {
   let currentOpenAccordion = null
 
   endpoints.endpoints.forEach((category, index) => {
-    // Create accordion header
+    // Create accordion header with proper capitalization
     const categoryId = `category-${index}`
     const accordionHeader = document.createElement("div")
     accordionHeader.className = "accordion-header"
     accordionHeader.dataset.target = categoryId
     accordionHeader.innerHTML = `
-    <h3>${category.name}</h3>
+    <h3>${capitalizeWords(category.name)}</h3>
     <span class="material-icons accordion-icon text-accent-primary">expand_more</span>
   `
 
@@ -620,7 +626,7 @@ function createApiItemElement(itemName, item, isLastItem) {
   const itemDiv = document.createElement("div")
   itemDiv.className = `w-full ${isLastItem ? "mb-0" : "mb-2"}` // Reduced margin
   itemDiv.dataset.name = itemName || ""
-  itemDiv.dataset.desc = item.desc || "No description available" // Fallback description
+  itemDiv.dataset.desc = item.desc || "No Description Available" // Fallback description with proper capitalization
 
   const heroSection = document.createElement("div")
   // Removed hover effects as requested
@@ -631,11 +637,11 @@ function createApiItemElement(itemName, item, isLastItem) {
 
   const title = document.createElement("h5")
   title.className = "text-lg font-semibold text-white truncate"
-  title.textContent = itemName || "Unnamed Item"
+  title.textContent = capitalizeWords(itemName || "Unnamed Item")
 
   const description = document.createElement("p")
   description.className = "text-sm font-medium text-gray-400 truncate mt-1"
-  description.textContent = item.desc || "No description available" // Fallback description
+  description.textContent = capitalizeWords(item.desc || "No Description Available") // Fallback description with proper capitalization
 
   textContent.appendChild(title)
   textContent.appendChild(description)
@@ -644,7 +650,7 @@ function createApiItemElement(itemName, item, isLastItem) {
   button.className = "premium-button px-5 py-2.5 text-sm font-medium flex-shrink-0 get-api-btn"
   button.dataset.apiPath = item.path || ""
   button.dataset.apiName = itemName || ""
-  button.dataset.apiDesc = item.desc || "No description available" // Fallback description
+  button.dataset.apiDesc = item.desc || "No Description Available" // Fallback description with proper capitalization
   button.textContent = "TRY"
 
   heroSection.appendChild(textContent)
@@ -662,7 +668,7 @@ function setupApiButtonHandlers(endpoints) {
         : event.target.closest(".get-api-btn")
       const { apiPath, apiName, apiDesc } = button.dataset
 
-      navigateToApiDetail(apiName, apiPath, apiDesc || "No description available")
+      navigateToApiDetail(apiName, apiPath, apiDesc || "No Description Available")
 
       // Save current page state
       localStorage.setItem("currentPage", "api-detail")
@@ -680,8 +686,8 @@ function setupApiDetailPage() {
     const previousPage = localStorage.getItem("previousPage") || "home"
     document.getElementById(`${previousPage}-page`).classList.remove("hidden")
 
-    // Update page title
-    document.getElementById("page-title").textContent = previousPage.charAt(0).toUpperCase() + previousPage.slice(1)
+    // Update page title with proper capitalization
+    document.getElementById("page-title").textContent = capitalizeWords(previousPage)
 
     // Update localStorage
     localStorage.setItem("currentPage", previousPage)
@@ -697,14 +703,14 @@ function setupApiDetailPage() {
       const copyButton = document.getElementById("detail-copy-endpoint")
       copyButton.classList.add("copied")
       copyButton.querySelector(".tooltip-text").textContent = "Copied!"
-      showToast("Endpoint copied to clipboard", "success")
+      showToast("Endpoint Copied To Clipboard", "success")
 
       setTimeout(() => {
         copyButton.classList.remove("copied")
-        copyButton.querySelector(".tooltip-text").textContent = "Copy to clipboard"
+        copyButton.querySelector(".tooltip-text").textContent = "Copy To Clipboard"
       }, 2000)
     } else {
-      showToast("Failed to copy endpoint", "error")
+      showToast("Failed To Copy Endpoint", "error")
     }
   })
 
@@ -727,16 +733,16 @@ function navigateToApiDetail(name, endpoint, description, method = "GET") {
     page.classList.add("hidden")
   })
 
-  // Update page title
-  document.getElementById("page-title").textContent = name
+  // Update page title with proper capitalization
+  document.getElementById("page-title").textContent = capitalizeWords(name)
 
   // Show API detail page
   const apiDetailPage = document.getElementById("api-detail-page")
   apiDetailPage.classList.remove("hidden")
 
-  // Set API details
-  document.getElementById("detail-api-title").textContent = name
-  document.getElementById("detail-api-description").textContent = description
+  // Set API details with proper capitalization
+  document.getElementById("detail-api-title").textContent = capitalizeWords(name)
+  document.getElementById("detail-api-description").textContent = capitalizeWords(description)
   document.getElementById("detail-api-method").textContent = method
 
   // Set endpoint URL
@@ -776,15 +782,15 @@ function setupApiParameters(endpoint) {
       if (key) {
         const isOptional = key.startsWith("_")
         // Capitalize first letter of parameter name for display
-        const displayName = key.charAt(0).toUpperCase() + key.slice(1)
-        const placeholderText = `Enter ${key}${isOptional ? " (optional)" : ""}`
+        const displayName = capitalizeWords(key)
+        const placeholderText = `Enter ${capitalizeWords(key)}${isOptional ? " (Optional)" : ""}`
 
         const paramField = document.createElement("div")
         paramField.className = "mb-4"
         paramField.innerHTML = `
         <label for="param-${key}" class="block text-sm font-medium text-gray-300 mb-2">${displayName}</label>
         <input type='text' id='param-${key}' class='premium-input w-full px-4 py-3 text-sm text-gray-200 rounded-lg focus:outline-none transition-all duration-300' placeholder='${placeholderText}'>
-        <div id='error-${key}' class='text-red-400 text-xs mt-2 hidden'>This field is required</div>
+        <div id='error-${key}' class='text-red-400 text-xs mt-2 hidden'>This Field Is Required</div>
       `
         paramsContainer.appendChild(paramField)
       }
@@ -796,15 +802,15 @@ function setupApiParameters(endpoint) {
         const paramName = match.replace(/{|}/g, "")
         const isOptional = paramName.startsWith("_")
         // Capitalize first letter of parameter name for display
-        const displayName = paramName.charAt(0).toUpperCase() + paramName.slice(1)
-        const placeholderText = `Enter ${paramName}${isOptional ? " (optional)" : ""}`
+        const displayName = capitalizeWords(paramName)
+        const placeholderText = `Enter ${capitalizeWords(paramName)}${isOptional ? " (Optional)" : ""}`
 
         const paramField = document.createElement("div")
         paramField.className = "mb-4"
         paramField.innerHTML = `
         <label for="param-${paramName}" class="block text-sm font-medium text-gray-300 mb-2">${displayName}</label>
         <input type='text' id='param-${paramName}' class='premium-input w-full px-4 py-3 text-sm text-gray-200 rounded-lg focus:outline-none transition-all duration-300' placeholder='${placeholderText}'>
-        <div id='error-${paramName}' class='text-red-400 text-xs mt-2 hidden'>This field is required</div>
+        <div id='error-${paramName}' class='text-red-400 text-xs mt-2 hidden'>This Field Is Required</div>
       `
         paramsContainer.appendChild(paramField)
       })
@@ -813,7 +819,7 @@ function setupApiParameters(endpoint) {
     if (!placeholderMatch) {
       const noParamsMessage = document.createElement("div")
       noParamsMessage.className = "text-gray-400 text-sm"
-      noParamsMessage.textContent = "This API endpoint does not require any parameters."
+      noParamsMessage.textContent = "This API Endpoint Does Not Require Any Parameters."
       paramsContainer.appendChild(noParamsMessage)
     }
   }
@@ -943,18 +949,18 @@ async function handleApiSubmit() {
         responseData.innerHTML = `
         <video controls class='max-w-full rounded-lg'>
           <source src='${objectUrl}' type='${contentType}'>
-          Your browser does not support the video tag.
+          Your Browser Does Not Support The Video Tag.
         </video>`
       } else if (contentType.includes("audio/")) {
         responseData.innerHTML = `
         <audio controls class='w-full'>
           <source src='${objectUrl}' type='${contentType}'>
-          Your browser does not support the audio tag.
+          Your Browser Does Not Support The Audio Tag.
         </audio>`
       } else {
         responseData.innerHTML = `
         <div class='text-center p-6'>
-          <p class='mb-3 text-gray-300'>Binary data received (${blob.size} bytes)</p>
+          <p class='mb-3 text-gray-300'>Binary Data Received (${blob.size} Bytes)</p>
         </div>`
       }
 
@@ -973,14 +979,14 @@ async function handleApiSubmit() {
         if (success) {
           copyButton.classList.add("copied")
           copyButton.querySelector(".tooltip-text").textContent = "Copied!"
-          showToast("Response copied to clipboard", "success")
+          showToast("Response Copied To Clipboard", "success")
 
           setTimeout(() => {
             copyButton.classList.remove("copied")
-            copyButton.querySelector(".tooltip-text").textContent = "Copy to clipboard"
+            copyButton.querySelector(".tooltip-text").textContent = "Copy To Clipboard"
           }, 2000)
         } else {
-          showToast("Failed to copy response", "error")
+          showToast("Failed To Copy Response", "error")
         }
       })
       responseActions.appendChild(copyButton)
@@ -995,14 +1001,14 @@ async function handleApiSubmit() {
         if (success) {
           copyButton.classList.add("copied")
           copyButton.querySelector(".tooltip-text").textContent = "Copied!"
-          showToast("Response copied to clipboard", "success")
+          showToast("Response Copied To Clipboard", "success")
 
           setTimeout(() => {
             copyButton.classList.remove("copied")
-            copyButton.querySelector(".tooltip-text").textContent = "Copy to clipboard"
+            copyButton.querySelector(".tooltip-text").textContent = "Copy To Clipboard"
           }, 2000)
         } else {
-          showToast("Failed to copy response", "error")
+          showToast("Failed To Copy Response", "error")
         }
       })
       responseActions.appendChild(copyButton)
@@ -1021,9 +1027,9 @@ async function handleApiSubmit() {
     copyButton.addEventListener("click", async () => {
       const success = await copyToClipboard(error.message)
       if (success) {
-        showToast("Error message copied to clipboard", "success")
+        showToast("Error Message Copied To Clipboard", "success")
       } else {
-        showToast("Failed to copy error message", "error")
+        showToast("Failed To Copy Error Message", "error")
       }
     })
     responseActions.appendChild(copyButton)
@@ -1058,13 +1064,13 @@ function setupGlobalSearch(endpoints) {
 
     const apiData = []
     endpoints.endpoints.forEach((category) => {
-      // Add category itself as a searchable item
+      // Add category itself as a searchable item with proper capitalization
       apiData.push({
         id: `category-${category.name}`,
-        title: category.name,
+        title: capitalizeWords(category.name),
         type: "category",
-        description: `Category containing ${Object.keys(category.items).length} API endpoints`,
-        category: category.name,
+        description: `Category Containing ${Object.keys(category.items).length} API Endpoints`,
+        category: capitalizeWords(category.name),
         items: Object.keys(category.items).length,
       })
 
@@ -1074,11 +1080,11 @@ function setupGlobalSearch(endpoints) {
           const item = itemData[itemName]
           apiData.push({
             id: key,
-            title: itemName,
+            title: capitalizeWords(itemName),
             type: "endpoint",
             path: item.path || "",
-            description: item.desc || "No description available",
-            category: category.name,
+            description: capitalizeWords(item.desc || "No Description Available"),
+            category: capitalizeWords(category.name),
           })
         })
       }
@@ -1144,7 +1150,7 @@ function setupGlobalSearch(endpoints) {
         const categoryHeader = document.createElement("div")
         categoryHeader.className = "mb-4 mt-6"
         categoryHeader.innerHTML = `
-          <h3 class="text-lg font-semibold text-white mb-2">${category}</h3>
+          <h3 class="text-lg font-semibold text-white mb-2">${capitalizeWords(category)}</h3>
           <div class="h-px bg-dark-600 w-full"></div>
         `
         searchResults.appendChild(categoryHeader)
@@ -1167,7 +1173,7 @@ function setupGlobalSearch(endpoints) {
                   <h4 class="text-lg font-medium text-white">${titleWithHighlight}</h4>
                   <p class="text-sm text-gray-400 mt-1">${descriptionWithHighlight}</p>
                   <div class="mt-2 flex items-center">
-                    <span class="text-xs bg-dark-700 text-gray-300 px-2 py-1 rounded-full">${result.items} endpoints</span>
+                    <span class="text-xs bg-dark-700 text-gray-300 px-2 py-1 rounded-full">${result.items} Endpoints</span>
                   </div>
                 </div>
               </div>
@@ -1394,7 +1400,7 @@ function createCopyButton() {
   button.className = "copy-button tooltip"
   button.innerHTML = `
   <span class="material-icons text-sm">content_copy</span>
-  <span class="tooltip-text">Copy to clipboard</span>
+  <span class="tooltip-text">Copy To Clipboard</span>
 `
   return button
 }
@@ -1405,7 +1411,7 @@ function createDownloadButton(url, filename) {
   button.className = "copy-button tooltip"
   button.innerHTML = `
   <span class="material-icons text-sm">download</span>
-  <span class="tooltip-text">Download file</span>
+  <span class="tooltip-text">Download File</span>
 `
 
   button.addEventListener("click", () => {
@@ -1415,7 +1421,7 @@ function createDownloadButton(url, filename) {
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
-    showToast("Download started", "success")
+    showToast("Download Started", "success")
   })
 
   return button

@@ -2,10 +2,10 @@
 const axios = require('axios');
 
 const meta = {
-    name: 'Blue Archive',
-    desc: 'Blue archive random image',
+    name: 'blue archive',
+    desc: 'blue archive random image',
     method: 'get',
-    category: 'Anime',
+    category: 'anime',
 };
 
 async function onStart({ req, res }) {
