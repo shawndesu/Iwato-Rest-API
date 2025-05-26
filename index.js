@@ -62,7 +62,6 @@ const chalk = require('chalk');
       const stats = fs.statSync(itemPath);
 
       if (stats.isDirectory()) {
-        // Track category hierarchy for documentation but not for routes
         const subCategory = categoryPath ? `${categoryPath}/${item}` : item;
         logger.info(`Found subdirectory: ${item}`);
         endpoints = endpoints.concat(
@@ -73,10 +72,8 @@ const chalk = require('chalk');
           const mod = require(itemPath);
           if (mod && typeof mod.onStart === 'function') {
             const name = item.replace('.js', '');
-            // Create route using just /api/endpoint-name without category folders
             const route = `/api/${name}`;
 
-            // wrap express handler
             app.all(route, async (req, res, next) => {
               try {
                 await mod.onStart({ req, res });
@@ -85,12 +82,17 @@ const chalk = require('chalk');
               }
             });
 
-            let displayPath = route;
+            let displayPath = `/api/${name}`;
             if (Array.isArray(mod.meta?.params) && mod.meta.params.length) {
               displayPath += '?' + mod.meta.params.map(p => `${p}=`).join('&');
+            } else if (mod.meta.path) {
+              const [pathPart, queryPart] = mod.meta.path.split('?');
+              if (pathPart !== `/${name}`) {
+                logger.warn(`meta.path path part does not match endpoint name for ${name}: expected /${name}, got ${pathPart}`);
+              }
+              displayPath += queryPart ? `?${queryPart}` : '';
             }
 
-            // Use category from metadata or derive from folder structure
             const cat = mod.meta.category || (categoryPath || 'Other');
             let bucket = endpoints.find(e => e.name === cat);
             if (!bucket) {
@@ -100,7 +102,7 @@ const chalk = require('chalk');
 
             bucket.items.push({
               [mod.meta.name || name]: {
-                desc: mod.meta.desc || 'No description provided',
+                desc: mod.meta.desc || mod.meta.description || 'No description provided',
                 path: displayPath,
               },
             });
